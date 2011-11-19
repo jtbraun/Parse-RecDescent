@@ -4,14 +4,7 @@ MANIFEST
 META.yml # Will be created by "make dist"
 Makefile.PL
 README
-lib/Parse/RecDescent.pm
-t/00.load.t
-t/pod.t
-tutorial/tutorial.html
-tutorial/TPJ-PRD-proc.gif
-tutorial/TPJ-yacc-proc.gif
-tutorial/TPJ_maze.gif
-tutorial/TPJ_tree.gif
+ToDo
 demo/demo.c
 demo/demo.pl
 demo/demo_Cgrammar.pl
@@ -77,9 +70,17 @@ demo/demo_textgen.pl
 demo/demo_tokens.pl
 demo/demo_undumper.pl
 demo/demo_whoson.pl
+lib/Parse/RecDescent.pm
+t/00.load.t
 t/basics.t
+t/leftop_cap.t
+t/pod.t
 t/re_capture_return.t
 t/separated_repetition.t
-t/leftop_cap.t
 t/skip.t
 t/skip_dynamic.t
+tutorial/TPJ-PRD-proc.gif
+tutorial/TPJ-yacc-proc.gif
+tutorial/TPJ_maze.gif
+tutorial/TPJ_tree.gif
+tutorial/tutorial.html

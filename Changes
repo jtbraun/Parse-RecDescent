@@ -612,3 +612,12 @@ Revision history for Parse-RecDescent
     - Added doc patch to make $skip semantics clearer (thanks Flavio!)
 
     - Fixed POD description of <rightop:...> semantics (thanks Dirk!)
+
+
+1.966_001  Mon Nov 14 10:34:52 2011
+
+    - Applied fix to restore skipped prefixes on match failure
+      (thanks Jeremy!)
+
+    - Removed formats to eliminate problems with filehandle duplication
+      in forked environments

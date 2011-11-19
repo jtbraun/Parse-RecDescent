@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Parse-RecDescent
-version:            1.966_000
+version:            1.966_001
 abstract:           Generate Recursive-Descent Parsers
 author:
     - Damian Conway <DCONWAY@CPAN.org>
