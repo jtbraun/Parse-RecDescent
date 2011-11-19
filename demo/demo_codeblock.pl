@@ -15,7 +15,7 @@ while (<>) {
 
 __DATA__
 
-line: block | call
+line: block | call*
 
 block: <perl_codeblock>
 

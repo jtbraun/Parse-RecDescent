@@ -607,7 +607,7 @@ sub changesskip($)
     {
         if (ref($item) =~ /Parse::RecDescent::(Action|Directive)/)
         {
-            return 1 if $item->{code} =~ /\$skip/;
+            return 1 if $item->{code} =~ /\$skip\s*=/;
         }
     }
     return 0;
@@ -1725,7 +1725,7 @@ use vars qw ( $AUTOLOAD $VERSION );
 
 my $ERRORS = 0;
 
-our $VERSION = '1.965001';
+our $VERSION = '1.966_000';
 
 # BUILDING A PARSER
 
@@ -1938,7 +1938,8 @@ sub _generate($$$;$$)
             _parse("an implicit subrule", $aftererror, $line,
                 "( $code )");
             my $implicit = $rule->nextimplicit;
-            $self->_generate("$implicit : $code",$replace,1);
+            return undef
+                if !$self->_generate("$implicit : $code",$replace,1);
             my $pos = pos $grammar;
             substr($grammar,$pos,0,$implicit);
             pos $grammar = $pos;;
@@ -2851,7 +2852,7 @@ sub AUTOLOAD    # ($parser, $text; $linenum, @args)
 {
     croak "Could not find method: $AUTOLOAD\n" unless ref $_[0];
     my $class = ref($_[0]) || $_[0];
-    my $text = ref($_[1]) ? ${$_[1]} : $_[1];
+    my $text = ref($_[1]) eq 'SCALAR' ? ${$_[1]} : "$_[1]";
     $_[0]->{lastlinenum} = $_[2]||_linecount($_[1]);
     $_[0]->{lastlinenum} = _linecount($_[1]);
     $_[0]->{lastlinenum} += ($_[2]||0) if @_ > 2;
@@ -2883,7 +2884,7 @@ sub AUTOLOAD    # ($parser, $text; $linenum, @args)
         foreach ( @{$_[0]->{errors}} ) { _error(@$_); }
     }
 
-    if (ref $_[1]) { ${$_[1]} = $text }
+    if (ref $_[1] eq 'SCALAR') { ${$_[1]} = $text }
 
     $ERRORS = 0;
     return $retval;
@@ -2931,8 +2932,8 @@ use vars '$errorprefix';
 sub redirect_reporting_to(*;$) {
     my ($filehandle, $mode) = (@_, '>');
 
-    # Ensure filehandles duplicate...
-    $mode =~ s{ (?<! & ) $ }{&}xms;
+    # Ensure filehandles alias...
+    $mode =~ s{ (?<! &= ) $ }{&=}xms;
 
     open (ERROR, $mode, $filehandle) or return;
     set_autoflush(\*ERROR);
@@ -2946,7 +2947,7 @@ sub redirect_reporting_to(*;$) {
     return 1;
 }
 
-open (ERROR, ">&STDERR");
+open (ERROR, ">&=STDERR");
 format ERROR =
 @>>>>>>>>>>>>>>>>>>>>: ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $errorprefix,          $errortext
@@ -2963,7 +2964,7 @@ use vars '$tracecontext';
 use vars '$tracerulename';
 use vars '$tracelevel';
 
-open (TRACE, ">&STDERR");
+open (TRACE, ">&=STDERR");
 format TRACE =
 @>|@|||||||||@^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<|
 $tracelevel, $tracerulename, '|', $tracemsg
@@ -2973,7 +2974,7 @@ $tracelevel, $tracerulename, '|', $tracemsg
 
 set_autoflush(\*TRACE);
 
-open (TRACECONTEXT, ">&STDERR");
+open (TRACECONTEXT, ">&=STDERR");
 format TRACECONTEXT =
 @>|@|||||||||@                                      |^<<<<<<<<<<<<<<<<<<<<<<<<<<<
 $tracelevel, $tracerulename, '|',                    $tracecontext
@@ -3148,7 +3149,7 @@ Parse::RecDescent - Generate Recursive-Descent Parsers
 
 =head1 VERSION
 
-This document describes version 1.965001 of Parse::RecDescent
+This document describes version 1.966_000 of Parse::RecDescent
 released April  9, 2003.
 
 =head1 SYNOPSIS
@@ -3177,6 +3178,7 @@ released April  9, 2003.
 
 
  # Change the universal token prefix pattern
+ # before building a grammar
  # (the default is: '\s*'):
 
     $Parse::RecDescent::skip = '[ \t]+';
@@ -3514,8 +3516,17 @@ The variable C<$Parse::RecDescent::skip> stores the universal
 prefix, which is the default for all terminal matches in all parsers
 built with C<Parse::RecDescent>.
 
+If you want to change the universal prefix using
+C<$Parse::RecDescent::skip>, be careful to set it I<before> creating the
+grammar object, because it is applied statically (when a grammar is
+built) rather than dynamically (when the grammar is used).
+
 The prefix for an individual production can be altered
-by using the C<E<lt>skip:...E<gt>> directive (see below).
+by using the C<E<lt>skip:...E<gt>> directive (described later).
+Setting this directive in the top-level rule is an alternative approach
+to setting C<$Parse::RecDescent::skip> before creating the object, but
+in this case you don't get the intended skipping behaviour if you
+directly invoke methods different from the top-level rule.
 
 
 =head2 Actions
@@ -4258,10 +4269,10 @@ C<E<lt>uncommitE<gt>> immediately revokes a preceding C<E<lt>commitE<gt>>
 example, in the rule:
 
     request: 'explain' expression
-       | 'explain' <commit> keyword
-       | 'save'
-       | 'quit'
-       | <uncommit> term '?'
+           | 'explain' <commit> keyword
+           | 'save'
+           | 'quit'
+           | <uncommit> term '?'
 
 if the text being matched was "explain?", and the first two
 productions failed, then the C<E<lt>commitE<gt>> in production two would cause
@@ -4339,6 +4350,7 @@ To overcome this problem, put the condition inside a do{} block:
 Note that the same problem may occur in other directives that take
 arguments. The same solution will work in all cases.
 
+
 =item Skipping between terminals
 
 The C<E<lt>skipE<gt>> directive enables the terminal prefix used in
@@ -4372,18 +4384,31 @@ There is no way of directly setting the prefix for
 an entire rule, except as follows:
 
     Rule: <skip: '[ \t]*'> Prod1
-    | <skip: '[ \t]*'> Prod2a Prod2b
-    | <skip: '[ \t]*'> Prod3
+        | <skip: '[ \t]*'> Prod2a Prod2b
+        | <skip: '[ \t]*'> Prod3
 
 or, better:
 
     Rule: <skip: '[ \t]*'>
     (
-    Prod1
+        Prod1
       | Prod2a Prod2b
       | Prod3
     )
 
+The skip pattern is passed down to subrules, so setting the skip for
+the top-level rule as described above actually sets the prefix for the
+entire grammar (provided that you only call the method corresponding to
+the top-level rule itself). This is the preferred alternative to setting
+C<$Parse::RecDescent::skip>.
+
+Additionally, using C<E<lt>skipE<gt>> actually allows you to have
+a completely dynamic skipping behaviour. For example:
+
+   Rule_with_dynamic_skip: <skip: $::skip_pattern> Rule
+
+Then you can set C<$::skip_pattern> before invoking
+C<Rule_with_dynamic_skip> and have it skip whatever you specified.
 
 B<Note: Up to release 1.51 of Parse::RecDescent, an entirely different
 mechanism was used for specifying terminal prefixes. The current method
@@ -5180,10 +5205,10 @@ In other words:
 is equivalent to a left-associative operator:
 
     output:  ident          { $return = [$item[1]]   }
-      |  ident '<<' expr        { $return = [@item[1,3]]     }
-      |  ident '<<' expr '<<' expr      { $return = [@item[1,3,5]]   }
-      |  ident '<<' expr '<<' expr '<<' expr    { $return = [@item[1,3,5,7]] }
-      #  ...etc...
+          |  ident '<<' expr        { $return = [@item[1,3]]     }
+          |  ident '<<' expr '<<' expr      { $return = [@item[1,3,5]]   }
+          |  ident '<<' expr '<<' expr '<<' expr    { $return = [@item[1,3,5,7]] }
+          #  ...etc...
 
 
 Similarly, the C<E<lt>rightop:...E<gt>> directive takes a left operand, an operator, and a right operand:
@@ -5197,11 +5222,11 @@ and converts them to:
 
 which is equivalent to a right-associative operator:
 
-    assign:  var        { $return = [$item[1]]       }
-      |  var '=' expr       { $return = [@item[1,3]]     }
-      |  var '=' var '=' expr   { $return = [@item[1,3,5]]   }
-      |  var '=' var '=' var '=' expr   { $return = [@item[1,3,5,7]] }
-      #  ...etc...
+    assign:  expr       { $return = [$item[1]]       }
+          |  var '=' expr       { $return = [@item[1,3]]     }
+          |  var '=' var '=' expr   { $return = [@item[1,3,5]]   }
+          |  var '=' var '=' var '=' expr   { $return = [@item[1,3,5,7]] }
+          #  ...etc...
 
 
 Note that for both the C<E<lt>leftop:...E<gt>> and C<E<lt>rightop:...E<gt>> directives, the directive does not normally
@@ -5801,8 +5826,41 @@ The correct way to set a return value in an action is to set the C<$return>
 variable:
 
     range: '(' start '..' end )'
-        { $return = $item{end} }
-       /\s+/
+                { $return = $item{end} }
+           /\s+/
+
+
+=head2 2. Setting C<$Parse::RecDescent::skip> at parse time
+
+If you want to change the default skipping behaviour (see
+L<Terminal Separators> and the C<E<lt>skip:...E<gt>> directive) by setting
+C<$Parse::RecDescent::skip> you have to remember to set this variable
+I<before> creating the grammar object.
+
+For example, you might want to skip all Perl-like comments with this
+regular expression:
+
+   my $skip_spaces_and_comments = qr/
+         (?mxs:
+            \s+         # either spaces
+            | \# .*?$   # or a dash and whatever up to the end of line
+         )*             # repeated at will (in whatever order)
+      /;
+
+And then:
+
+   my $parser1 = Parse::RecDescent->new($grammar);
+
+   $Parse::RecDescent::skip = $skip_spaces_and_comments;
+
+   my $parser2 = Parse::RecDescent->new($grammar);
+
+   $parser1->parse($text); # this does not cope with comments
+   $parser2->parse($text); # this skips comments correctly
+
+The two parsers behave differently, because any skipping behaviour
+specified via C<$Parse::RecDescent::skip> is hard-coded when the
+grammar object is built, not at parse time.
 
 
 =head1 DIAGNOSTICS

@@ -81,3 +81,5 @@ t/basics.t
 t/re_capture_return.t
 t/separated_repetition.t
 t/leftop_cap.t
+t/skip.t
+t/skip_dynamic.t
