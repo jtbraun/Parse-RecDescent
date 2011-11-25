@@ -36,7 +36,7 @@ q{
 			{ print "found: [$item[1]] at $thisline\n" }
 
 	include	 : '#include' filename
-			{ 
+			{
 			  print "pre: [$text] at $thisline\n";
 			  $text = ::loadfile($item[-1]) . $text;
 			  Parse::RecDescent::LineCounter::resync $thisline;
@@ -54,7 +54,7 @@ q{
 	linedir:   '#line' /\d+/
 
 	codeline : /.*\n/
-			{ $return = ::demacro($item[-1]); }	
+			{ $return = ::demacro($item[-1]); }
 
 };
 

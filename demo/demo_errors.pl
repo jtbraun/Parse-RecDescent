@@ -14,13 +14,13 @@ q{
         Para:     Sentence(s) /\Z/
 
         # Can also intercept the error messages like so: ##
-        
+
            |    { use Data::Dumper 'Dumper';
                   print "$_->[0]\n" for @{$thisparser->{errors}};
                   exit;
-                } 
+                }
 
-        Sentence: Noun Verb 
+        Sentence: Noun Verb
                 | Verb Noun
                 | <error>
 

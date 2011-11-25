@@ -24,7 +24,7 @@ my $parse = Parse::RecDescent->new(<<'EndGrammar');
 
 	term: <leftop:factor mult_op factor>
 			{ evalop($item[1]) }
-  
+
 	mult_op: '*'	{ sub { $_[0] *= $_[1] } }
 	       | '/'	{ sub { $_[0] /= $_[1] } }
 

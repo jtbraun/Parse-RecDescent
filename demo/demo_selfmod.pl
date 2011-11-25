@@ -13,7 +13,7 @@ q{
 
 		  | "$::keyword" <commit> identifier(s) is type_name /('?s)?/ ';'
 		       { my $newnames = join " | ", map { "'$_'" } @{$item[3]};
-			  $thisparser->Extend("type_name: $newnames"); 
+			  $thisparser->Extend("type_name: $newnames");
 			  print "added $newnames as type name(s)\n";
 		       }
 
@@ -26,7 +26,7 @@ q{
 
 	is        : /is|are/
 
-	type_name : 'int' | 'float' 
+	type_name : 'int' | 'float'
 
 	identifier: ...!is ...!"$::keyword" ...!type_name /[A-Za-z]\w*/
 

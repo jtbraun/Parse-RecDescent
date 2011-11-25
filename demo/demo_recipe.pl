@@ -15,7 +15,7 @@ q{
 			{ print "$item[1]\n" }
 	      | <resync:[ ]{2}>
 
-	Verb: 
+	Verb:
 		'boil'
 	      | 'peel'
 	      | 'mix'
@@ -32,7 +32,7 @@ q{
 		IngredientQualifier(s) Ingredient
 	      | ReferenceQualifier(s) Ingredient
 	      | Reference
-	      
+
 	Clause:
 	        SubordinateClause
               | CoordinateClause
@@ -60,7 +60,7 @@ q{
 
 	QuantityUnit:
 		/lbs?/
-		
+
 
 	Object:
 		ReferenceQualifier Ingredient
@@ -127,5 +127,5 @@ Boil six large potatoes until they are grey and then marinate them
 for at least two hours in a mixture of lard, olive oil, raw
 sugar, and sea-salt.  In a deep-fryer melt 2 lbs of bacon fat and
 bring to the boil.  Fry the marinated potatoes for 7 minutes, or
-until they are nicely charred.  Serve with lashings of butter.  
+until they are nicely charred.  Serve with lashings of butter.
 Sprinkle with salt and vinegar to taste.

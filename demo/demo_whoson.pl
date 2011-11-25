@@ -22,7 +22,7 @@ $abbott = new Parse::RecDescent <<'EOABBOTT';
 				: "No, $::man{$item[4]}\'s on $item[4]"
 			}
 
-	      | Preface(s?) Name /[i']s the (name of the)?/ Man /('s name )?on/ Base 
+	      | Preface(s?) Name /[i']s the (name of the)?/ Man /('s name )?on/ Base
 			{ (lc $::man{$item[6]} eq lc $item[2])
 				? "Certainly"
 				: "No. \u$item[2] is on " . $::base{lc $item[2]}
@@ -48,10 +48,10 @@ EOABBOTT
 $costello = new Parse::RecDescent <<'EOCOSTELLO';
 
 	Interpretation:
-		Meaning <reject:$item[1] eq $thisparser->{prev}> 
+		Meaning <reject:$item[1] eq $thisparser->{prev}>
 			{ $thisparser->{prev} = $item[1] }
 	      | { choose(@::attempt) }
-		
+
 	Meaning:
 		Question
 	      | UnclearReferent
@@ -94,7 +94,7 @@ EOCOSTELLO
 %man = ( first => "Who", second => "What", third => "I Don't Know" );
 %base  = map { lc } reverse %man;
 
-@attempt = 
+@attempt =
 (
 	"So, who's on first?",
 	"I want to know who's on first?",

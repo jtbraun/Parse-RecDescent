@@ -4,8 +4,8 @@
 
 # REMOVE COMMENTS FROM C++ CODE
 
-# ORIGINAL BY Helmut Jarausch 
-# EXTENDED BY Damian Conway AND Helmut Jarausch 
+# ORIGINAL BY Helmut Jarausch
+# EXTENDED BY Damian Conway AND Helmut Jarausch
 
 use strict;
 use Parse::RecDescent;
@@ -40,12 +40,12 @@ part	: comment
         | C_code
         | string
 
-C_code  : m{(			
+C_code  : m{(
 	      [^"/]+		# one or more non-delimiters
 	      (			# then (optionally)...
 	       /		# a potential comment delimiter
 	       [^*/]		# which is not an actual delimiter
-	      )?		# 
+	      )?		#
 	    )+			# all repeated once or more
 	   }x
 		{ $Code .= $item[1] }
@@ -73,7 +73,7 @@ comment	: m{\s*			# optional whitespace
 	    (?:[^*]+|\*(?!/))*	# anything except */
 	    \*/		        # comment closer
             ([ \t]*)?           # trailing blanks or tabs
-	   }x	
+	   }x
 		{ $Code .= " "; $Comments .= $item[1] }
 
 EOF
@@ -92,7 +92,7 @@ int main()
   char *cp2 = "cp2";
   int i;  // a counter
           // remove this line altogehter
-  int k;  
+  int k;
       int more_indented;  // keep indentation
       int l;  /* a loop
              variable */

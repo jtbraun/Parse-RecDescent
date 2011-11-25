@@ -10,26 +10,26 @@ use strict;
 use Parse::RecDescent;
 use Data::Dumper;
 
-my $grammar = q(              
-              
+my $grammar = q(
+
 	      file: <rulevar: local $file>
               file:  section(s)
                 { $file }
-                
+
               section:  header '{' body '}'
                 { $file->{$item[1]} = $item[3] }
-                
+
               header: 'Domain=' /.+/
-                
+
 	      body: <rulevar: local $body>
               body: line(s)
                 { $body }
-                
+
               line: lineA | lineB
-                
+
               lineA: /[^\W_]+/ '=' /.+/
                 { $body->{$item[1]} = $item[3] }
-                
+
               lineB: /[^\W_]+/ '_' /[^\W_]+/ '=' /.+/
                 { $body->{$item[1]}{$item[3]} = $item[5] }
                );

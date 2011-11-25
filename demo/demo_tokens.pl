@@ -2,7 +2,7 @@
 
 use Parse::RecDescent;
 use Data::Dumper;
- 
+
 my $lexer = new Parse::RecDescent q
 {
 	lex:	token(s)

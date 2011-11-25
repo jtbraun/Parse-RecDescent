@@ -2,7 +2,7 @@
 
 # PARSE AND EVALUATE LOGICAL EXPRESSIONS WITH A OO PARSE TREE
 
-$::RD_AUTOACTION = 
+$::RD_AUTOACTION =
 	q{ bless [$item[-1]], $item[0] };
 
 use Parse::RecDescent;

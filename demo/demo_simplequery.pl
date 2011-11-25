@@ -23,7 +23,7 @@ my $grammar = <<'EOGRAMMAR';
 
 	string: quoted_string
 	      | bareword
-	
+
 	quoted_string:
 		 { my $string = extract_delimited($text,q{'"});
 		   $return = substr($string,1,length($string)-2) if $string; }

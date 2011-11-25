@@ -85,7 +85,7 @@ for my $id (sort keys %$parsed) {
   unless (exists $id_ref->{used} or $id eq $start) {
     print "$id defined in @{[sort keys %{$id_ref->{defined}}]} but not used - WARNING\n";
   }
-}    
+}
 
 use Data::Dumper; print Dumper($parsed);
 show($start);

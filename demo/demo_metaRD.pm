@@ -25,7 +25,7 @@ component  : rule
 rule       : <skip:""> "\n" <skip: '[ \t]'> identifier ":"
 	     <skip: $item[1]> production(s? /|/)
 
-production : items(s) 
+production : items(s)
 
 item       : lookahead(s?) simpleitem
            | directive

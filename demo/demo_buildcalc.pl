@@ -3,7 +3,7 @@
 use Parse::RecDescent;
 
 $RD_AUTOACTION = q{ $item[-1]; # JUST TO SHOW THEY WORK WITH PRECOMPILED PARSERS
-}; 
+};
 
 Parse::RecDescent->Precompile(<<'EndGrammar', "Calc", $0 );
 
@@ -43,7 +43,7 @@ Parse::RecDescent->Precompile(<<'EndGrammar', "Calc", $0 );
 
 	multiplication: <leftop:factor mult_op factor>
 			{ my $mult = $item[1]; sub { ::evalop($mult) } }
-  
+
 	factor: number
 	      | rvar
 	      | '(' expr ')' { $item[2] }
@@ -52,6 +52,6 @@ Parse::RecDescent->Precompile(<<'EndGrammar', "Calc", $0 );
 
 	lvar:	/\$([a-z]\w*)/		{ $1 }
 
-	rvar:	lvar			{ sub { no strict 'refs'; ${$item[1]} } } 
+	rvar:	lvar			{ sub { no strict 'refs'; ${$item[1]} } }
 
 EndGrammar

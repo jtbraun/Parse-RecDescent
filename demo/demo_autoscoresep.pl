@@ -8,7 +8,7 @@ $RD_TRACE=1;
 my $parse = Parse::RecDescent->new(<<'EOGRAMMAR');
 
 line: <autoscore: @{$item[1]}>
-line: seplist[sep=>','] 
+line: seplist[sep=>',']
     | seplist[sep=>':']
     | seplist[sep=>" "]
 

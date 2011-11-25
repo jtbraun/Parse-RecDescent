@@ -14,13 +14,13 @@ select:		ask_select qualifier(?) field /of/ qualifier(?) table
 				{ "SELECT DISTINCT $item[3]\nFROM $item[6]\n" }
 	      |	ask_select qualifier(?) table /'?/ qualifier(?) field
 				{ "SELECT DISTINCT $item[6]\nFROM $item[3]\n" }
-	      |	ask_select qualifier(?) table 
+	      |	ask_select qualifier(?) table
 				{ "SELECT *\nFROM $item[3]\n" }
 
 sum:		ask_count table prep qualifier field prep(?) value
 				{ "SELECT COUNT(*)\nFROM $item[2]\n" .
 				  "WHERE $item[5] = $item[7]\n" }
-   |		ask_count table 
+   |		ask_count table
 				{ "SELECT COUNT(*)\nFROM $item[2]\n" }
 
 identify:	ask_select(?) /who supplies/ qualifier value
@@ -67,7 +67,7 @@ prep:		/for|of|with|by/
 
 EOGRAMMAR
 
-my $parser = Parse::RecDescent->new($grammar) 
+my $parser = Parse::RecDescent->new($grammar)
 	or die "Bad grammar";
 
 $| = 1;

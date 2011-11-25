@@ -19,7 +19,7 @@ q{
 			{ $return = $item[2]; }
 		| <error>
 
-	field   : /field/ ident /is/ ident 
+	field   : /field/ ident /is/ ident
 
 	ident   : /[A-Za-z]\w*/
 			{ f(); $return = $item[1]; }
