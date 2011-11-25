@@ -33,7 +33,7 @@ use Pod::Usage;
 #$::RD_ERRORS		= 1;					# Print errors
 #$::RD_WARN 		= 1;
 #$::RD_TRACE 		= 1;					# Print tracecode to STDERR
-#$::RD_AUTOSTUB 	= 1;					
+#$::RD_AUTOSTUB 	= 1;
 
 ###############################################################
 # Grammar used to find and remove comments from C source code #
@@ -48,12 +48,12 @@ part	: comment 		{ $thisparser->{code}		.= " "; }
         | C_code  		{ $thisparser->{code}     	.= $item[1]; }
         | string  		{ $thisparser->{code}     	.= qq("$item[1]"); }
 
-C_code  : m{(			
+C_code  : m{(
 	      [^"/]+	# one or more non-delimiters
 	      (			# then (optionally)...
 	       /		# a potential comment delimiter
 	       [^*/]	# which is not an actual delimiter
-	      )?		# 
+	      )?		#
 	    )+			# all repeated once or more
 	   }x
 
@@ -87,23 +87,23 @@ END_OF_DECOMMENT
 # ####################################################################################
 my $Cgrammar = <<'END_OF_C_GRAMMAR';
 
-	translation_unit: 
-		external_declaration(s)	
+	translation_unit:
+		external_declaration(s)
 	|	<error>
-		
+
 	external_declaration:
-		function_definition  	
-	|	declaration 
-	|	<resync> 
-		{  
-			if ($::opt_SKIPPEDLINES || (defined $::opt_VERBOSE and $::opt_VERBOSE >= 1 )) 
+		function_definition
+	|	declaration
+	|	<resync>
+		{
+			if ($::opt_SKIPPEDLINES || (defined $::opt_VERBOSE and $::opt_VERBOSE >= 1 ))
 			{
 				print "Skipping line $thisline\n"	# Try next line if possible...
-			} 
-		 }							
-				  
+			}
+		 }
+
 	function_definition:
-		declaration_specifiers(?) declarator declaration_list(?) compound_statement 
+		declaration_specifiers(?) declarator declaration_list(?) compound_statement
 		{
 			if($::opt_FUNCTIONS)
 			{
@@ -112,7 +112,7 @@ my $Cgrammar = <<'END_OF_C_GRAMMAR';
 				$::functions_output .= ::flatten_list($item[3]) . ";\n";
 			}
 		}
-	
+
 	declaration:
 		declaration_specifiers init_declarator_list(?) ';'
 		{
@@ -123,34 +123,34 @@ my $Cgrammar = <<'END_OF_C_GRAMMAR';
 				$::declarations_output .= ::flatten_list($item[3]) . "\n";
             }
         }
-	
+
 	declaration_list:
-		declaration(s) 
-		
-	declaration_specifiers: 
-		type_qualifier 			declaration_specifiers(?) 
-	|	storage_class_specifier declaration_specifiers(?) 
-	|	type_specifier  		declaration_specifiers(?) 
+		declaration(s)
+
+	declaration_specifiers:
+		type_qualifier 			declaration_specifiers(?)
+	|	storage_class_specifier declaration_specifiers(?)
+	|	type_specifier  		declaration_specifiers(?)
 
 	storage_class_specifier:
-		  'auto' 
-		| 'register' 
-		| 'static' 
-		| 'extern' 
-		| 'typedef' 
+		  'auto'
+		| 'register'
+		| 'static'
+		| 'extern'
+		| 'typedef'
 
 	type_specifier:
-		  'int' 
-		| 'double' 
-		| 'void' 
-		| 'char' 
-		| 'long' 
-		| 'float' 
-		| 'signed' 
-		| 'unsigned' 
-		| 'short' 
-		| struct_or_union_specifier 
-		| enum_specifier 
+		  'int'
+		| 'double'
+		| 'void'
+		| 'char'
+		| 'long'
+		| 'float'
+		| 'signed'
+		| 'unsigned'
+		| 'short'
+		| struct_or_union_specifier
+		| enum_specifier
 		| typedef_name ...typedef_name_lookahead { [$item[1] ] }
 
 	typedef_name_lookahead:
@@ -160,9 +160,9 @@ my $Cgrammar = <<'END_OF_C_GRAMMAR';
 #	|	')'
 
 	type_qualifier:
-		  'const' 
+		  'const'
 		| 'volatile'
-	
+
 	struct_or_union_specifier:
 		  struct_or_union IDENTIFIER(?) '{' struct_declaration_list(?) '}'
           {
@@ -174,15 +174,15 @@ my $Cgrammar = <<'END_OF_C_GRAMMAR';
 				$::structs_output .= ::flatten_list($item[5]) . ";\n\n";
 			}
           }
-		| struct_or_union IDENTIFIER 
-	
+		| struct_or_union IDENTIFIER
+
 	struct_or_union:
-		  'struct' 		
-		| 'union'    
-		  
-	
+		  'struct'
+		| 'union'
+
+
 	struct_declaration_list:
-		struct_declaration(s) 
+		struct_declaration(s)
 
 	init_declarator_list:
 		init_declarator(s /(,)/)
@@ -225,27 +225,27 @@ my $Cgrammar = <<'END_OF_C_GRAMMAR';
 		IDENTIFIER ('=' constant_expression)(?)
 
 	declarator:
-		pointer(?) direct_declarator 
-		
+		pointer(?) direct_declarator
+
 	function_signature:
-		'[' constant_expression(?) ']' 
-	|	'(' parameter_type_list ')'		
-	|	'(' identifier_list(?) ')'		
-	
+		'[' constant_expression(?) ']'
+	|	'(' parameter_type_list ')'
+	|	'(' identifier_list(?) ')'
+
 	direct_declarator:
-		IDENTIFIER function_signature(s?) 	
+		IDENTIFIER function_signature(s?)
 	|	'(' declarator ')' function_signature(s?)
 
 
 	pointer:
-	  '*' type_qualifier_list(?) pointer(?) 
+	  '*' type_qualifier_list(?) pointer(?)
 
 	type_qualifier_list:
 		type_qualifier(s)
 
 	parameter_type_list:
 		parameter_list (',' '...')(?)
-	
+
 	parameter_list:
 		parameter_declaration(s /(,)/)
 
@@ -281,7 +281,7 @@ my $Cgrammar = <<'END_OF_C_GRAMMAR';
 	typedef_name:
 		IDENTIFIER
 
-	statement:	
+	statement:
 		selection_statement
 	|	expression_statement
 	|	iteration_statement
@@ -293,7 +293,7 @@ my $Cgrammar = <<'END_OF_C_GRAMMAR';
 	labeled_statement:
 		'case' constant_expression ':' statement
 	|	IDENTIFIER ':' statement
-	|	'default' ':' statement  
+	|	'default' ':' statement
 
 	expression_statement:
 		expression(?) ';'
@@ -324,7 +324,7 @@ my $Cgrammar = <<'END_OF_C_GRAMMAR';
 
 	assignment_expression:
 		unary_expression ASSIGNMENT_OPERATOR assignment_expression
-	|	conditional_expression 
+	|	conditional_expression
 
 
 	conditional_expression:
@@ -332,7 +332,7 @@ my $Cgrammar = <<'END_OF_C_GRAMMAR';
 
 	constant_expression:
 		conditional_expression
-	
+
 	logical_OR_expression:
 		logical_AND_expression(s /(\|\|)/)
 
@@ -374,8 +374,8 @@ my $Cgrammar = <<'END_OF_C_GRAMMAR';
 	|	'sizeof' '(' type_name ')'
 	|   UNARY_OPERATOR cast_expression
 	|	'sizeof'  	unary_expression
-		
-		
+
+
 	postfix_expression:
 		primary_expression postfix_expression_token(s?)
 
@@ -385,7 +385,7 @@ my $Cgrammar = <<'END_OF_C_GRAMMAR';
 		| '(' argument_expression_list(?)')'
 		| '.'  IDENTIFIER
 		| '->' IDENTIFIER
-		| '++' 
+		| '++'
 		| '--'
 
 
@@ -414,7 +414,7 @@ my $Cgrammar = <<'END_OF_C_GRAMMAR';
 		 |(?:[1-9]\d*)		  					# Decimal
 		 [uUlL]?			  					# Suffix
 		 /x
-		 
+
 	CHARACTER_CONSTANT:
 		/'([^\\'"]							# None of these
 		 |\\['\\ntvbrfa'"]  				# or a backslash followed by one of those
@@ -426,26 +426,26 @@ my $Cgrammar = <<'END_OF_C_GRAMMAR';
 		 (?:\.|(?=[eE]))						# There may be no floating point only if an exponent is present
 		 \d*									# Zero or more floating digits
 		 ([eE][+-]?\d+)?						# expontent
-		 [lLfF]?								# Suffix 
+		 [lLfF]?								# Suffix
 		/x
 
 	ENUMERATION_CONSTANT:
-		INTEGER_CONSTANT	
+		INTEGER_CONSTANT
 
 	STRING:
 		/"(([^\\'"])							# None of these
 		|(\\[\\ntvbrfa'"])					# or a backslash followed by one of those
-		|(\\[0-7]{1,3})|(\\x\d+))*"/x		# or an octal or hex 
-	
+		|(\\[0-7]{1,3})|(\\x\d+))*"/x		# or an octal or hex
+
 	IDENTIFIER:
 		/(?!(auto|break|case|char|const|continue|default|do|double|else|enum|extern|float|for|goto		# LOOKAHEAD FOR KEYWORDS
 			|if|int|long|register|return|signed|sizeof|short|static|struct|switch|typedef			# NONE OF THE KEYWORDS
 			|union|unsigned|void|volatile|while)[^a-zA-Z_])											# SHOULD FULLY MATCH!
 			(([a-zA-Z]\w*)|(_\w+))/x																# Check for valid identifier
-  
+
 	ASSIGNMENT_OPERATOR:
 		'=' | '*=' | '/=' | '%=' | '+=' | '-=' | '<<=' | '>>=' | '&=' | '^=' | '|='
-	
+
 	UNARY_OPERATOR:
 		'&' | '*' | '+' | '-' | '~' | '!'
 
@@ -587,9 +587,9 @@ foreach (<PREPROCESS>) {
     if (
         m{\s*																				# Optional whitespace
 		\#																					# Preprocessor opener
-		\s*																					# Optional whitespace 
+		\s*																					# Optional whitespace
 		(?:(define|include|undef|ifdef|ifndef|if|endif|else|elif|line|error|pragma)\s)	 	# Keyword followed by one or more whitespace
-		.*																					# anything (optinal) 
+		.*																					# anything (optinal)
 		}x || $skip_line
       )
     {
@@ -640,7 +640,7 @@ print "\nDeclarations:\n\n$declarations_output\n\n"
 print "\nStructures:\n\n$structs_output\n\n"
   if defined $structs_output
   and $opt_STRUCTS;
-  
+
 __END__
 
 
@@ -650,17 +650,17 @@ __END__
 
 
 =head1 NAME
- 
+
 csourceparser.pl - extract components from sourcecode written in the C programming language
- 
- 
+
+
 =head1 VERSION
- 
+
 This documentation refers to csourceparser.pl version 0.1.0
- 
- 
+
+
 =head1 SYNOPSIS
- 
+
 B<./csourceparser.pl  [OPTION]  ...   FILE ...>
 
 B<Examples:>
@@ -678,11 +678,11 @@ Print all structures in a C-file:
 ./csourceparser.pl -u myheader.h
 
 =head1 REQUIRED ARGUMENTS
- 
+
 One or more C-Sourcefiles to parse.
- 
+
 =head1 OPTIONS
- 
+
 =over 4
 
 =item B<-c, --code>
@@ -704,18 +704,18 @@ Prints the signatures of functions defined in the source file to stdout (the fun
 =item B<-h, --help>
 
 Print this help
-			
+
 =item B<-p, --precompile>
 
 Generate precompiled parsers Cgrammar.pm and DecommentGrammar.pm in the current working directory. Precompiled parsers will speed up parsing.
 If these files are available in the current working directory they will be used automatically. Every time the --precompile
-option is set the precompiled parsers are generateted newly so this option should only be used only once. 
-Also, don't forget to recreate the precompiled parseres if you modify the grammar. 
+option is set the precompiled parsers are generateted newly so this option should only be used only once.
+Also, don't forget to recreate the precompiled parseres if you modify the grammar.
 
 =item B<-s, --skippedlines>
 
 Show which lines had been skipped during parse due to parser errors or unrecognized tokens in the C source code
-						
+
 =item B<-t, --trace>
 
 Print full tracecode generated by Parse::RecDescent. Note: this can be B<a lot>
@@ -726,11 +726,11 @@ Print all structs and unions defined in the C sourcefile
 
 =item B<-v, --verbose>
 
-Each use encreases verbosity level by one. 
-	
+Each use encreases verbosity level by one.
+
 =over 4
 
-=item Level 1: 
+=item Level 1:
 
 Print parsed sourcecode and skipped lines (same as I<-sc>)
 
@@ -744,24 +744,24 @@ Print full tracecode.
 
 =back
 
-=back				
- 
+=back
+
 =head1 DIAGNOSTICS
 
-If you don't get the output you expect try to set the -sc options to see what happens. 
+If you don't get the output you expect try to set the -sc options to see what happens.
 When the parser can't handle the input it will silently get skipped (for empty lines this is a normal behaviour).
 
-If the parser doesn't behave as you expect take a look at the tracecode, e.g. ./csourceparser -t file.c 2> trace for full tracecode or 
-./csourceparser -vv file.c 2> trace to see only parser level 3 (C-parser) trace code. Depending on the size of the input file(s) this could take 
+If the parser doesn't behave as you expect take a look at the tracecode, e.g. ./csourceparser -t file.c 2> trace for full tracecode or
+./csourceparser -vv file.c 2> trace to see only parser level 3 (C-parser) trace code. Depending on the size of the input file(s) this could take
 some time and may occupy some hd-space.
 
 Please refer to the Parse::RecDescent documentation if you get errors after modifying the grammar.
 
 =head1 DEPENDENCIES
- 
+
 =over 4
 
-=item * 
+=item *
 
 Perl >= v5.00800
 
@@ -776,28 +776,28 @@ Getopt::Long
 =item *
 
 Pod::Usage
- 
+
 =head1 BUGS AND LIMITATIONS
- 
+
 Macros in C-Files could not be parsed at this time. Any declarations and definitions containing macros my cause errors.
 Perhaps this feature could be implemented in the  future by using a "real" preprocessor like m4.
 
 Please report problems to Hendrik Sirges  (hendrik.sirges at fh-swf.de)
 Patches are welcome.
- 
+
 =head1 AUTHOR
- 
+
  Hendrik Sirges  <hendrik.sirges[at]fh-swf.de>
- 
+
 =head1 LICENCE AND COPYRIGHT
- 
-This program is Copyright 2005 by Hendrik Sirges.  This program is free software; you can redistribute 
+
+This program is Copyright 2005 by Hendrik Sirges.  This program is free software; you can redistribute
 it and/or modify it under the terms of the Perl Artistic License or the GNU General Public
 License as published by the Free Software Foundation; either version 2 of the License, or (at your
 option) any later version.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
-even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General 
+even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
 Public License for more details.
 
 If you do not have a copy of the GNU General Public License write to the Free Software Foundation,

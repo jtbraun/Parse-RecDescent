@@ -72,7 +72,7 @@ comment	: m{\s*			# optional whitespace
 	    (?:[^*]+|\*(?!/))*	# anything except */
 	    \*/		        # comment closer
             ([ \t]*)?           # trailing blanks or tabs
-	   }x	
+	   }x
 
 
 

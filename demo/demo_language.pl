@@ -160,7 +160,7 @@ my $script = <DATA>;
 my $tree = $parser->Script($script)
 	or die "Bad script";
 
-print $tree->eval(); 
+print $tree->eval();
 
 __DATA__
 

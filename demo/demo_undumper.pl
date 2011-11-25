@@ -43,7 +43,7 @@ an example of an interesting grammar and usage.
 
 Or perhaps you can develop it into a full reference/dereference parser?
 
--- 
+--
 Randal L. Schwartz - Stonehenge Consulting Services, Inc. - +1 503 777 0095
 <merlyn@stonehenge.com> <URL:http://www.stonehenge.com/merlyn/>
 Perl/Unix/security consulting, Technical writing, Comedy, etc. etc.
@@ -299,28 +299,28 @@ next time, enjoy!
         =1=     #!/usr/bin/perl -w
         =2=     use strict;
         =3=     $|++;
-        =4=     
+        =4=
         =5=     # $::RD_TRACE = 80;
         =6=     $::RD_HINT = 1;
-        =7=     
+        =7=
         =8=     use Parse::RecDescent;
         =9=     use Data::Dumper;
-        =10=    
+        =10=
         =11=    ## define grammar
-        =12=    
+        =12=
         =13=    my $parser = Parse::RecDescent->new(q{
-        =14=    
+        =14=
         =15=    { my %TABLE; }
-        =16=    
+        =16=
         =17=    file: { %TABLE = (); } assignment(s?) /\z/ { \%TABLE }
-        =18=    
+        =18=
         =19=    assignment: scalar_assignment | <error>
-        =20=    
+        =20=
         =21=    scalar_assignment: scalar_lvalue '=' scalar_rvalue ';'
         =22=      { ${$item{scalar_lvalue}} = ${$item{scalar_rvalue}}; 1; }
-        =23=    
+        =23=
         =24=    ## lvalues, indicated as reference to value, so we can assign to them
-        =25=    
+        =25=
         =26=    scalar_lvalue: deref_head deref_chain(?) {
         =27=      my $return = $item{deref_head};
         =28=      if ($item{deref_chain}) {
@@ -338,23 +338,23 @@ next time, enjoy!
         =40=    deref_chain: "->" hash_or_array_subscript deref_chain_more(s?)
         =41=      { [$item[2], @{$item[3]}] }
         =42=    deref_chain_more: "->" hash_or_array_subscript | hash_or_array_subscript
-        =43=    hash_or_array_subscript: hash_subscript | array_subscript 
+        =43=    hash_or_array_subscript: hash_subscript | array_subscript
         =44=    hash_subscript: "{" scalar_constant "}"
         =45=      { ["hash", $item{scalar_constant}] }
         =46=    array_subscript: "[" scalar_constant "]"
         =47=      { ["array", $item{scalar_constant}] }
-        =48=    
+        =48=
         =49=    simple_scalar_lvalue: '$' ident
         =50=      { \ $TABLE{'$' . $item{ident}} }
         =51=    ident: /[^\W\d]\w*/
-        =52=    
+        =52=
         =53=    simple_scalar_lvalue: '$' '{' scalar_rvalue '}'
         =54=      { \ ${${$item{scalar_rvalue}}} }
-        =55=    
+        =55=
         =56=    ## rvalues, indicated as reference to value, because "undef" is legal
-        =57=    
+        =57=
         =58=    scalar_rvalue: simple_scalar_rvalue | scalar_lvalue
-        =59=    
+        =59=
         =60=    simple_scalar_rvalue: scalar_constant
         =61=    scalar_constant: 'undef'
         =62=      { \ undef }
@@ -362,7 +362,7 @@ next time, enjoy!
         =64=      { \ $item[1] }
         =65=    scalar_constant: <perl_quotelike>
         =66=      { \ $item[1][2] }
-        =67=    
+        =67=
         =68=    simple_scalar_rvalue: "\x5C" scalar_rvalue
         =69=      { \ $item{scalar_rvalue} }
         =70=    simple_scalar_rvalue: '[' scalar_rvalue(s? /,/) ']'
@@ -375,11 +375,11 @@ next time, enjoy!
         =77=      { \ bless( ${$item{scalar_rvalue}}, ${$item{scalar_constant}} ) }
         =78=    simple_scalar_rvalue: 'do' '{' "\x5C" '(' 'my' '$o' '=' scalar_rvalue ')' '}'
         =79=      { \ do { \ (my $o = ${$item{scalar_rvalue}})} }
-        =80=    
+        =80=
         =81=    }) or die "compile";
-        =82=    
+        =82=
         =83=    ## following tests from t/dumper.t in 5.6.1 distribution
-        =84=    
+        =84=
         =85=    if (0) {
         =86=      my @c = ('c');
         =87=      my $c = \@c;
@@ -388,28 +388,28 @@ next time, enjoy!
         =90=      $b->{a} = $a;
         =91=      $b->{b} = $a->[1];
         =92=      $b->{c} = $a->[2];
-        =93=    
+        =93=
         =94=      test([$a, $b, $c], [qw(a b c)]);
         =95=    }
-        =96=    
+        =96=
         =97=    if (0) {
         =98=      my $foo = { "abc\000\'\efg" => "mno\000",
         =99=                  "reftest" => \\1,
         =100=               };
-        =101=   
+        =101=
         =102=     test([$foo], [qw($foo)]);
         =103=   }
-        =104=   
+        =104=
         =105=   if (0) {
         =106=     my $foo = 5;
         =107=     my @foo = (-10,\$foo);
         =108=     my %foo = (a=>1,b=>\$foo,c=>\@foo);
         =109=     $foo{d} = \%foo;
         =110=     $foo[2] = \%foo;
-        =111=   
+        =111=
         =112=     test([\%foo],[qw($foo)]);
         =113=   }
-        =114=   
+        =114=
         =115=   if (0) {
         =116=     my @dogs = ( 'Fido', 'Wags' );
         =117=     my %kennel = (
@@ -420,33 +420,33 @@ next time, enjoy!
         =122=     my $mutts = \%kennel;
         =123=     test([\@dogs, \%kennel, $mutts], [qw($dogs $kennel $mutts)]);
         =124=   }
-        =125=   
+        =125=
         =126=   if (0) {
         =127=     my $a = [];
         =128=     $a->[1] = \$a->[0];
         =129=     test([$a], [qw($a)]);
         =130=   }
-        =131=   
+        =131=
         =132=   if (0) {
         =133=     my $a = \\\\\'foo';
         =134=     my $b = $$$a;
         =135=     test([$a, $b], [qw($a $b)]);
         =136=   }
-        =137=   
+        =137=
         =138=   if (1) {
         =139=     my $b;
         =140=     my $a = [{ a => \$b }, { b => undef }];
         =141=     $b = [{ c => \$b }, { d => \$a }];
         =142=     timetest([$a, $b], [qw($a $b)]);
         =143=   }
-        =144=   
+        =144=
         =145=   if (0) {
         =146=     my $a = [[[[\\\\\'foo']]]];
         =147=     my $b = $a->[0][0];
         =148=     my $c = $${$b->[0][0]};
         =149=     test([$a, $b, $c], [qw($a $b $c)]);
         =150=   }
-        =151=   
+        =151=
         =152=   if (0) {
         =153=     my $f = "pearl";
         =154=     my $e = [        $f ];
@@ -456,32 +456,32 @@ next time, enjoy!
         =158=     my $a = { 'b' => $b };
         =159=     test([$a, $b, $c, $d, $e, $f], [qw($a $b $c $d $e $f)]);
         =160=   }
-        =161=   
+        =161=
         =162=   if (0) {
         =163=     my $a;
         =164=     $a = \$a;
         =165=     my $b = [$a];
         =166=     test([$b], [qw($b)]);
         =167=   }
-        =168=   
+        =168=
         =169=   ## end of tests from t/dumper.t, now some of my own
-        =170=   
+        =170=
         =171=   if (0) {
         =172=     my $x = bless {fred => 'flintstone'}, 'x';
         =173=     my $y = bless \$x, 'y';
         =174=     timetest([$x, $y], [qw($x $y)]);
         =175=   }
-        =176=   
+        =176=
         =177=   sub test {
         =178=     my $input = Data::Dumper->new(@_)->Purity(1)->Dumpxs;
         =179=     print "=" x 60, "\ninput:\n$input\n==>\noutput:\n";
         =180=     my $symbol = $parser->file($input) or die "execute";
         =181=     print Data::Dumper->new([values %$symbol], [keys %$symbol])->Purity(1)->Dumpxs;
         =182=   }
-        =183=   
+        =183=
         =184=   sub timetest {
         =185=     require Benchmark;
-        =186=   
+        =186=
         =187=     my $input = Data::Dumper->new(@_)->Purity(1)->Dumpxs;
         =188=     print "=" x 60, "\ninput:\n$input\n==>\noutput:\n";
         =189=     Benchmark::timethese(0, {

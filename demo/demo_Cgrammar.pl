@@ -54,17 +54,17 @@ cast_expression:
 multiplicative_expression:
           (cast_expression mul_ex_op)(s?) cast_expression
 
-mul_ex_op : '*' | '/' | '%' 
+mul_ex_op : '*' | '/' | '%'
 
 additive_expression:
           (multiplicative_expression add_op)(s?) multiplicative_expression
 
-add_op : '+' | '-' 
+add_op : '+' | '-'
 
 shift_expression:
           (additive_expression shift_op )(s?) additive_expression
 
-shift_op : LEFT_OP | RIGHT_OP 
+shift_op : LEFT_OP | RIGHT_OP
 
 relational_expression:
           (shift_expression rel_op)(s?) shift_expression
@@ -74,7 +74,7 @@ rel_op: '<' | '>' | LE_OP | GE_OP
 equality_expression:
           (relational_expression eq_ex_op)(s?) relational_expression
 
-eq_ex_op : EQ_OP | NE_OP 
+eq_ex_op : EQ_OP | NE_OP
 
 and_expression:
           (equality_expression '&')(s?) equality_expression
@@ -261,7 +261,7 @@ direct_abstract_declarator:
         | DAD '(' ')'
         | DAD '(' parameter_type_list ')'
 
-DAD:    #macro for direct_abstract_declarator 
+DAD:    #macro for direct_abstract_declarator
           ( '(' abstract_declarator ')' )(s?)
           ( '[' ']' )(s?)
           ( '[' constant_expression ']' )(s?)
@@ -342,7 +342,7 @@ reserved_word:
         AUTO     | BREAK   | CASE     | CHAR   | CONST    |
         CONTINUE | DEFAULT | DO       | DOUBLE | ENUM     |
         EXTERN   | FLOAT   | FOR      | GOTO   | IF       |
-        INT      | LONG    | REGISTER | RETURN | SHORT    | 
+        INT      | LONG    | REGISTER | RETURN | SHORT    |
         SIGNED   | SIZEOF  | STATIC   | STRUCT | SWITCH   |
         TYPEDEF  | UNION   | UNSIGNED | VOID   | VOLATILE |
         WHILE

@@ -21,7 +21,7 @@ sub new
 
 	unitag:
 		m{<([a-zA-Z]+)/>}	{ bless [], $1 }
-		
+
 	tag:
 		m{<([a-zA-Z]+)>}	{ $return = $1 }
 

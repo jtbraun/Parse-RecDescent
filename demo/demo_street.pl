@@ -21,7 +21,7 @@ sub Parse::RecDescent::street_name
 
 my $parser = Parse::RecDescent->new(<<'EOGRAMMAR');
 
-	addr: /\d+[A-Z]?/i street_name 
+	addr: /\d+[A-Z]?/i street_name
 		{ print "Number $item[1] in $item{street_name}\n" }
 
 EOGRAMMAR

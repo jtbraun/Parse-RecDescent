@@ -16,7 +16,7 @@ my $parser = Parse::RecDescent->new(<<'EOGRAMMAR');
 	command:	'\\' literal options(?) args(?)
 
 	options:	'[' option(s? /,/) ']'
-	
+
 	args:		'{' element(s?) '}'
 
 	option:		/[^][\\$&%#_{}~^ \t\n,]+/

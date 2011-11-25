@@ -22,7 +22,7 @@ $RD_AUTOACTION = q{ [@item] };
 $grammar =
 q{
 	expr	:	disj
-	
+
 	disj	:	conj 'or' disj | conj
 
 	conj	:	unary 'and' conj | unary

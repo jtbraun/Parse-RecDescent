@@ -20,10 +20,10 @@ $grammar =
 q{
 	expr	:	<leftop: conj /(\|\|)/ conj>
 				{ rpn(@{$item[1]}) }
-	
+
 	conj	:	<leftop: addn /(&&)/ addn>
 				{ rpn(@{$item[1]}) }
-	
+
 	addn	:	<leftop: mult /([+-])/ mult >
 				{ rpn(@{$item[1]}) }
 

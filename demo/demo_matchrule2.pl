@@ -16,10 +16,10 @@ $grammar = q {
 
 	base: /[ACGT]/
 
-	after_A: /[C]/ 
-	after_C: /[AG]/ 
+	after_A: /[C]/
+	after_C: /[AG]/
 	after_G: /[CT]/
-	after_T: /[G]/ 
+	after_T: /[G]/
 };
 
 $parser = new Parse::RecDescent( $grammar ) or

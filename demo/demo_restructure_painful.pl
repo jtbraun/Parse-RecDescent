@@ -10,13 +10,13 @@ use strict;
 use Parse::RecDescent;
 use Data::Dumper;
 
-my $grammar = q(              
-              
-              { 
+my $grammar = q(
+
+              {
                sub consolidate {
                    my $aref = shift;
                    my @a = @{$aref};
-                   
+
                    my %new = ();
                    foreach my $a (@a) {
                        my %h = %{$a};
@@ -32,27 +32,27 @@ my $grammar = q(
                    }
                    return \%new;
                }
-                
+
            }
-                
+
               file:  section(s)
                 { $return = consolidate($item[1]) }
-                
+
               section:  header '{' body '}'
                 { $return = { $item[1] => $item[3] } }
-                
+
               header: 'Domain=' /.+/
                 { $return = $item[2] }
-                
+
               body: line(s)
                 { $return = consolidate($item[1])  }
-                
+
               line: lineA | lineB
                 { $return = $item[1] }
-                
+
               lineA: /[^\W_]+/ '=' /.+/
                 { $return = { $item[1] => $item[3] } }
-                
+
               lineB: /[^\W_]+/ '_' /[^\W_]+/ '=' /.+/
                 { $return = { $item[1] => { $item[3] => $item[5] } } }
                );

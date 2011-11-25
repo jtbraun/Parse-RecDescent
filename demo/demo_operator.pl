@@ -13,7 +13,7 @@ q{
 		|	<leftop: atom '<<' num>
 
 	atomlist: <leftop: atom /,?/ atom>
-	
+
 	no_garbage: /^\s*$/
 		  | <error: Trailing garbage: $text>
 
@@ -42,7 +42,7 @@ use Data::Dumper;
 print "> ";
 while (<>)
 {
-	
+
 	if (/^\.$/) { print STDERR Data::Dumper->Dump([$parse->expr($input)]);
 		      $input = '' }
 	else	    { $input .= $_ }

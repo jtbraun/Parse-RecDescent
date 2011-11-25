@@ -19,7 +19,7 @@ my $parse = Parse::RecDescent->new(<<'EndGrammar');
 
 	term: left_assoc[qw{factor mult_op factor}]
 	    | factor
-  
+
 	mult_op: '*'	{ sub { $_[0] * $_[1] } }
 	       | '/'	{ sub { $_[0] / $_[1] } }
 
@@ -39,7 +39,7 @@ my $parse = Parse::RecDescent->new(<<'EndGrammar');
 				while @terms>1;
 			  $terms[0];
 			}
-	
+
 	left_assoc_left: <matchrule:$arg[0]> <matchrule:$arg[1]>
 			{ [ @item[1..2] ] }
 

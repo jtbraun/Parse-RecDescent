@@ -53,7 +53,7 @@ $input = '';
 print "> ";
 while (<>)
 {
-	
+
 	if (/^\.$/) { $parse->inputs($input) || print "huh?\n"; $input = '' }
 	else	    { $input .= $_ }
 	print "> ";

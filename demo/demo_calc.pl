@@ -50,7 +50,7 @@ my $parse = Parse::RecDescent->new(<<'EndGrammar');
 
     multiplication: <leftop:factor mult_op factor>
             { my $mult = $item[1]; sub { ::evalop $mult } }
-  
+
     mult_op: '*'    { sub { $_[0] *= $_[1] } }
            | '/'    { sub { $_[0] /= $_[1] } }
 
@@ -62,7 +62,7 @@ my $parse = Parse::RecDescent->new(<<'EndGrammar');
 
     lvar:   /\$([a-z]\w*)/      { $1 }
 
-    rvar:   lvar            { sub { no strict 'refs'; ${$item[1]} } } 
+    rvar:   lvar            { sub { no strict 'refs'; ${$item[1]} } }
 
 EndGrammar
 
