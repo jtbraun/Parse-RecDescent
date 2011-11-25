@@ -103,21 +103,21 @@ sub TIESCALAR   # ($classname, \$text, $thisparser, $prevflag)
           }, $_[0];
 }
 
-my %counter_cache;
-
 sub FETCH
 {
     my $parser = $_[0]->{parser};
+    my $cache = $parser->{linecounter_cache};
     my $from = $parser->{fulltextlen}-length(${$_[0]->{text}})-$_[0]->{prev}
 ;
 
-    unless (exists $counter_cache{$from}) {
-    $parser->{lastlinenum} = $parser->{offsetlinenum}
-           - Parse::RecDescent::_linecount(substr($parser->{fulltext},$from))
-           + 1;
-    $counter_cache{$from} = $parser->{lastlinenum};
+    unless (exists $cache->{$from})
+    {
+        $parser->{lastlinenum} = $parser->{offsetlinenum}
+          - Parse::RecDescent::_linecount(substr($parser->{fulltext},$from))
+          + 1;
+        $cache->{$from} = $parser->{lastlinenum};
     }
-    return $counter_cache{$from};
+    return $cache->{$from};
 }
 
 sub STORE
@@ -828,7 +828,6 @@ sub code($$$$)
 
     $code .=
 '
-
         Parse::RecDescent::_trace(q{>>Matched production: ['
                       . $self->describe . ']<<},
                       Parse::RecDescent::_tracefirst($text),
@@ -2602,7 +2601,7 @@ sub _generate($$$;$$)
                            a maximum repetition of zero, nor can they have
                            negative components in their ranges.");
                 }
-	      }
+            }
             else
             {
                 _parse("a subrule match", $aftererror,$line,$code);
@@ -2860,6 +2859,7 @@ sub AUTOLOAD    # ($parser, $text; $linenum, @args)
     $_[0]->{offsetlinenum} = $_[0]->{lastlinenum};
     $_[0]->{fulltext} = $text;
     $_[0]->{fulltextlen} = length $text;
+    $_[0]->{linecounter_cache} = {};
     $_[0]->{deferred} = [];
     $_[0]->{errors} = [];
     my @args = @_[3..$#_];
