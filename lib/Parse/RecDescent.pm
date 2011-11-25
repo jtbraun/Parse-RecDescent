@@ -56,7 +56,7 @@ sub Precompile
         $modulefile =~ s/.*:://;
         $modulefile .= ".pm";
 
-        open OUT, ">$modulefile"
+        open OUT, ">", $modulefile
             or croak("Can't write to new module file '$modulefile'");
 
         print STDERR "precompiling grammar from file '$sourcefile'\n",
@@ -2681,9 +2681,10 @@ sub _generate($$$;$$)
         my $code = $self->_code();
         if (defined $::RD_TRACE)
         {
+            my $mode = ($nextnamespace eq "namespace000002") ? '>' : '>>';
             print STDERR "printing code (", length($code),") to RD_TRACE\n";
             local *TRACE_FILE;
-            open TRACE_FILE, ">RD_TRACE"
+            open TRACE_FILE, $mode, "RD_TRACE"
             and print TRACE_FILE "my \$ERRORS;\n$code"
             and close TRACE_FILE;
         }
