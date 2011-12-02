@@ -6,7 +6,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..19\n"; }
+BEGIN { $| = 1; print "1..21\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Parse::RecDescent;
 $loaded = 1;
@@ -44,6 +44,8 @@ $expect4  = 'rover';
 
 $data5    = 'type a is int; type b is a; var x holds b; type c is d;';
 $expect5  = 'typedef=>a, typedef=>b, defn=>x, baddef, baddef';
+
+require './t/util.pl';
 
 ##################################################################
 
@@ -120,6 +122,21 @@ $parser_A = new Parse::RecDescent q
 
 	test7: 'x' <resync> /y+/
 			{ $return = $item[3] }
+
+#================================================================#
+
+	test8:	'a' b /c+/ 'dddd' e 'f'
+	        { &::make_itempos_text(\@item, \@itempos); }
+
+	e: /ee/
+
+#================================================================#
+
+	test9:	'a' d(s) /c/
+	        { &::make_itempos_text(\@item, \@itempos); }
+
+    d: 'd' 'd' 'd'
+
 };
 
 ok ($parser_A) or exit;
@@ -157,7 +174,7 @@ ok($res,$expect5);
 
 ##################################################################
 $res = $parser_A->test4("a  b   c");
-ok($res, "0:1:7");
+ok($res, "0:3:7");
 
 ##################################################################
 $res = $parser_A->test5("fred");
@@ -183,8 +200,28 @@ ok($res, "prod 2");
 $res = $parser_A->test7("x yyy \n y");
 ok($res, "y");
 
+##################################################################
+
+$res = $parser_A->test8("a\n b\n  cccccccccc\ndddd    ee\n   f");
+ok($res,'
+a          offset.from=  0 offset.to=  0 line.from=  1 line.to=  1 column.from=  1 column.to=  1
+b          offset.from=  3 offset.to=  3 line.from=  2 line.to=  2 column.from=  2 column.to=  2
+cccccccccc offset.from=  7 offset.to= 16 line.from=  3 line.to=  3 column.from=  3 column.to= 12
+dddd       offset.from= 18 offset.to= 21 line.from=  4 line.to=  4 column.from=  1 column.to=  4
+ee         offset.from= 26 offset.to= 27 line.from=  4 line.to=  4 column.from=  9 column.to= 10
+f          offset.from= 32 offset.to= 32 line.from=  5 line.to=  5 column.from=  4 column.to=  4
+');
 
 ##################################################################
+$res = $parser_A->test9("a\n d d \n d d d d \n d d d\nc\n");
+ok($res,'
+a          offset.from=  0 offset.to=  0 line.from=  1 line.to=  1 column.from=  1 column.to=  1
+_REF_      offset.from=  3 offset.to= 23 line.from=  2 line.to=  4 column.from=  2 column.to=  6
+c          offset.from= 25 offset.to= 25 line.from=  5 line.to=  5 column.from=  1 column.to=  1
+');
+
+##################################################################
+
 
 package Derived;
 

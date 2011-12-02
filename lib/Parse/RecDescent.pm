@@ -352,19 +352,19 @@ sub nextimplicit($)
 
 sub code
 {
-    my ($self, $namespace, $parser) = @_;
+    my ($self, $namespace, $parser, $check) = @_;
 
 eval 'undef &' . $namespace . '::' . $self->{"name"} unless $parser->{saving};
 
     my $code =
 '
-# ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args)
+# ARGS ARE: ($parser, $text; $repeating, $_noactions, $_itempos, \@args)
 sub ' . $namespace . '::' . $self->{"name"} .  '
 {
-   	my $thisparser = $_[0];
-   	use vars q{$tracelevel};
-   	local $tracelevel = ($tracelevel||0)+1;
-   	$ERRORS = 0;
+	my $thisparser = $_[0];
+	use vars q{$tracelevel};
+	local $tracelevel = ($tracelevel||0)+1;
+	$ERRORS = 0;
     my $thisrule = $thisparser->{"rules"}{"' . $self->{"name"} . '"};
 
     Parse::RecDescent::_trace(q{Trying rule: [' . $self->{"name"} . ']},
@@ -387,9 +387,10 @@ sub ' . $namespace . '::' . $self->{"name"} .  '
     my $commit=0;
     my @item = ();
     my %item = ();
-    my $repeating =  defined($_[2]) && $_[2];
-    my $_noactions = defined($_[3]) && $_[3];
-    my @arg =    defined $_[4] ? @{ &{$_[4]} } : ();
+    my $repeating =  $_[2];
+    my $_noactions = $_[3];
+    my $_itempos = $_[4];
+    my @arg =    defined $_[5] ? @{ &{$_[5]} } : ();
     my %arg =    ($#arg & 01) ? @arg : (@arg, undef);
     my $text;
     my $lastsep;
@@ -716,14 +717,46 @@ sub additem
     return $item;
 }
 
+sub _duplicate_itempos
+{
+    my ($src) = @_;
+    my $dst = {};
+
+    foreach (keys %$src)
+    {
+        %{$dst->{$_}} = %{$src->{$_}};
+    }
+    $dst;
+}
+
+sub _update_itempos
+{
+    my ($dst, $src, $typekeys, $poskeys) = @_;
+
+    my @typekeys = 'ARRAY' eq ref $typekeys ?
+      @$typekeys :
+      keys %$src;
+
+    foreach my $k (keys %$src)
+    {
+        if ('ARRAY' eq ref $poskeys)
+        {
+            @{$dst->{$k}}{@$poskeys} = @{$src->{$k}}{@$poskeys};
+        }
+        else
+        {
+            %{$dst->{$k}} = %{$src->{$k}};
+        }
+    }
+}
 
 sub preitempos
 {
     return q
     {
         push @itempos, {'offset' => {'from'=>$thisoffset, 'to'=>undef},
-                'line'   => {'from'=>$thisline,   'to'=>undef},
-                'column' => {'from'=>$thiscolumn, 'to'=>undef} };
+                        'line'   => {'from'=>$thisline,   'to'=>undef},
+                        'column' => {'from'=>$thiscolumn, 'to'=>undef} };
     }
 }
 
@@ -731,9 +764,21 @@ sub incitempos
 {
     return q
     {
-        $itempos[$#itempos]{'offset'}{'from'} += length($1);
+        $itempos[$#itempos]{'offset'}{'from'} += length($lastsep);
         $itempos[$#itempos]{'line'}{'from'}   = $thisline;
         $itempos[$#itempos]{'column'}{'from'} = $thiscolumn;
+    }
+}
+
+sub unincitempos
+{
+    # the next incitempos will properly set these two fields, but
+    # {'offset'}{'from'} needs to be decreased by length($lastsep)
+    # $itempos[$#itempos]{'line'}{'from'}
+    # $itempos[$#itempos]{'column'}{'from'}
+    return q
+    {
+        $itempos[$#itempos]{'offset'}{'from'} -= length($lastsep) if defined $lastsep;
     }
 }
 
@@ -775,7 +820,7 @@ sub code($$$$)
 
 ';
     $code .=
-'       my @itempos = ({});
+'        my @itempos = ({});
 '           if $parser->{_check}{itempos};
 
     my $item;
@@ -834,6 +879,15 @@ sub code($$$$)
                       q{' . $rule->{name} . '},
                       $tracelevel)
                         if defined $::RD_TRACE;
+
+' . ( $parser->{_check}{itempos} ? '
+        if ( defined($_itempos) )
+        {
+            Parse::RecDescent::Production::_update_itempos($_itempos, $itempos[ 1], undef, [qw(from)]);
+            Parse::RecDescent::Production::_update_itempos($_itempos, $itempos[-1], undef, [qw(to)]);
+        }
+' : '' ) . '
+
         $_matched = 1;
         last;
     }
@@ -1107,7 +1161,7 @@ sub new ($$$$$$)
 }
 
 
-sub code($$$$)
+sub code($$$$$)
 {
     my ($self, $namespace, $rule, $check) = @_;
     my $ldel = $self->{"ldelim"};
@@ -1133,7 +1187,8 @@ my $code = '
         . ($check->{itempos}? 'do {'.Parse::RecDescent::Production::incitempos().' 1} and ' : '')
         . '  $text =~ m' . $ldel . '\A(?:' . $self->{"pattern"} . ')' . $rdel . $mod . ')
         {
-            '.($self->{"lookahead"} ? '$text = $_savetext;' : '$text = $lastsep . $text if defined $lastsep;').'
+            '.($self->{"lookahead"} ? '$text = $_savetext;' : '$text = $lastsep . $text if defined $lastsep;') .
+            ($check->{itempos} ? Parse::RecDescent::Production::unincitempos() : '') . '
             $expectation->failed();
             Parse::RecDescent::_trace(q{<<Didn\'t match terminal>>},
                           Parse::RecDescent::_tracefirst($text))
@@ -1141,7 +1196,7 @@ my $code = '
 
             last;
         }
-   	   	$current_match = substr($text, $-[0], $+[0] - $-[0]);
+        $current_match = substr($text, $-[0], $+[0] - $-[0]);
         substr($text,0,length($current_match),q{});
         Parse::RecDescent::_trace(q{>>Matched terminal<< (return value: [}
                         . $current_match . q{])},
@@ -1207,13 +1262,14 @@ my $code = '
         . '  $text =~ m/\A' . quotemeta($self->{"pattern"}) . '/)
         {
             '.($self->{"lookahead"} ? '$text = $_savetext;' : '$text = $lastsep . $text if defined $lastsep;').'
+            '. ($check->{itempos} ? Parse::RecDescent::Production::unincitempos() : '') . '
             $expectation->failed();
             Parse::RecDescent::_trace(qq{<<Didn\'t match terminal>>},
                           Parse::RecDescent::_tracefirst($text))
                             if defined $::RD_TRACE;
             last;
         }
-   	   	$current_match = substr($text, $-[0], $+[0] - $-[0]);
+        $current_match = substr($text, $-[0], $+[0] - $-[0]);
         substr($text,0,length($current_match),q{});
         Parse::RecDescent::_trace(q{>>Matched terminal<< (return value: [}
                         . $current_match . q{])},
@@ -1282,6 +1338,7 @@ my $code = '
         )
         {
             '.($self->{"lookahead"} ? '$text = $_savetext;' : '$text = $lastsep . $text if defined $lastsep;').'
+            '. ($check->{itempos} ? Parse::RecDescent::Production::unincitempos() : '') . '
             $expectation->failed();
             Parse::RecDescent::_trace(q{<<Didn\'t match terminal>>},
                           Parse::RecDescent::_tracefirst($text))
@@ -1343,7 +1400,7 @@ sub new ($$$$;$$$)
 
 sub code($$$$)
 {
-    my ($self, $namespace, $rule) = @_;
+    my ($self, $namespace, $rule, $check) = @_;
 
 '
         Parse::RecDescent::_trace(q{Trying subrule: [' . $self->{"subrule"} . ']},
@@ -1361,6 +1418,7 @@ sub code($$$$)
         . $self->callsyntax($namespace.'::')
         . '($thisparser,$text,$repeating,'
         . ($self->{"lookahead"}?'1':'$_noactions')
+        . ($check->{"itempos"}?',$itempos[$#itempos]':',undef')
         . ($self->{argcode} ? ",sub { return $self->{argcode} }"
                    : ',sub { \\@arg }')
         . ')))
@@ -1457,7 +1515,7 @@ sub new ($$$$$$$$$$)
 
 sub code($$$$)
 {
-    my ($self, $namespace, $rule) = @_;
+    my ($self, $namespace, $rule, $check) = @_;
 
     my ($subrule, $repspec, $min, $max, $lookahead) =
         @{$self}{ qw{subrule repspec min max lookahead} };
@@ -1476,6 +1534,7 @@ sub code($$$$)
         . $self->callsyntax($namespace.'::')
         . ', ' . $min . ', ' . $max . ', '
         . ($self->{"lookahead"}?'1':'$_noactions')
+        . ($check->{"itempos"}?',$itempos[$#itempos]':',undef')
         . ',$expectation,'
         . ($self->{argcode} ? "sub { return $self->{argcode} }"
                         : 'sub { \\@arg }')
@@ -1555,7 +1614,9 @@ sub new
 
 sub code($$$$)
 {
-    my ($self, $namespace, $rule) = @_;
+    my ($self, $namespace, $rule, $check) = @_;
+
+    my @codeargs = @_[1..$#_];
 
     my ($leftarg, $op, $rightarg) =
         @{$self}{ qw{leftarg op rightarg} };
@@ -1575,14 +1636,29 @@ sub code($$$$)
         {
           $repcount = 0;
           my  @item;
-          ';
+';
+
+    $code .= '
+          my  $_itempos = $itempos[-1];
+          my  $itemposfirst;
+' if $check->{itempos};
 
     if ($self->{type} eq "leftop" )
     {
         $code .= '
           # MATCH LEFTARG
-          ' . $leftarg->code(@_[1..2]) . '
+          ' . $leftarg->code(@codeargs) . '
 
+';
+
+        $code .= '
+          if (defined($_itempos) and !defined($itemposfirst))
+          {
+              $itemposfirst = Parse::RecDescent::Production::_duplicate_itempos($_itempos);
+          }
+' if $check->{itempos};
+
+        $code .= '
           $repcount++;
 
           my $savetext = $text;
@@ -1592,12 +1668,12 @@ sub code($$$$)
           while ($repcount < ' . $self->{max} . ')
           {
             $backtrack = 0;
-            ' . $op->code(@_[1..2]) . '
+            ' . $op->code(@codeargs) . '
             ' . ($op->isterminal() ? 'pop @item;' : '$backtrack=1;' ) . '
             ' . (ref($op) eq 'Parse::RecDescent::Token'
                 ? 'if (defined $1) {push @item, $item{'.($self->{name}||$self->{hashname}).'}=$1; $backtrack=1;}'
                 : "" ) . '
-            ' . $rightarg->code(@_[1..2]) . '
+            ' . $rightarg->code(@codeargs) . '
             $savetext = $text;
             $repcount++;
           }
@@ -1615,10 +1691,19 @@ sub code($$$$)
           while ($repcount < ' . $self->{max} . ')
           {
             $backtrack = 0;
-            ' . $leftarg->code(@_[1..2]) . '
+            ' . $leftarg->code(@codeargs) . '
+';
+        $code .= '
+            if (defined($_itempos) and !defined($itemposfirst))
+            {
+                $itemposfirst = Parse::RecDescent::Production::_duplicate_itempos($_itempos);
+            }
+' if $check->{itempos};
+
+        $code .= '
             $repcount++;
             $backtrack = 1;
-            ' . $op->code(@_[1..2]) . '
+            ' . $op->code(@codeargs) . '
             $savetext = $text;
             ' . ($op->isterminal() ? 'pop @item;' : "" ) . '
             ' . (ref($op) eq 'Parse::RecDescent::Token' ? 'do { push @item, $item{'.($self->{name}||$self->{hashname}).'}=$1; } if defined $1;' : "" ) . '
@@ -1627,7 +1712,7 @@ sub code($$$$)
           pop @item if $backtrack;
 
           # MATCH RIGHTARG
-          ' . $rightarg->code(@_[1..2]) . '
+          ' . $rightarg->code(@codeargs) . '
           $repcount++;
           ';
     }
@@ -1636,9 +1721,23 @@ sub code($$$$)
 
     $code .= '
           $_tok = [ @item ];
+';
+
+
+    $code .= '
+          if (defined $itemposfirst)
+          {
+              Parse::RecDescent::Production::_update_itempos(
+                  $_itempos, $itemposfirst, undef, [qw(from)]);
+          }
+' if $check->{itempos};
+
+    $code .= '
           last;
         }
+';
 
+    $code .= '
         unless ($repcount>='.$self->{min}.')
         {
             Parse::RecDescent::_trace(q{<<Didn\'t match operator: ['
@@ -1661,8 +1760,8 @@ sub code($$$$)
                         if defined $::RD_TRACE;
 
         push @item, $item{'.($self->{name}||$self->{hashname}).'}=$_tok||[];
-
 ';
+
     return $code;
 }
 
@@ -2058,7 +2157,7 @@ sub _generate($$$;$$)
             elsif ($grammar =~ m/$AUTOTREEMK/gco)
             {
                 my $base = defined($1) ? $1 : "";
-   	   	my $current_match = substr($grammar, $-[0], $+[0] - $-[0]);
+                my $current_match = substr($grammar, $-[0], $+[0] - $-[0]);
                 $base .= "::" if $base && $base !~ /::$/;
                 _parse("an autotree marker", $aftererror,$line, $current_match);
                 if ($rule)
@@ -2732,7 +2831,7 @@ sub _check_insatiable($$$$)
        )
     {
         return unless $1 eq $subrule && $min > 0;
-   	my $current_match = substr($grammar, $-[0], $+[0] - $-[0]);
+        my $current_match = substr($grammar, $-[0], $+[0] - $-[0]);
         _warn(3,"Subrule sequence \"$subrule($repspec) $current_match\" will
                (almost certainly) fail.",$line)
         and
@@ -2874,7 +2973,7 @@ sub AUTOLOAD    # ($parser, $text; $linenum, @args)
 
     croak "Unknown starting rule ($AUTOLOAD) called\n"
         unless defined &$AUTOLOAD;
-    my $retval = &{$AUTOLOAD}($_[0],$text,undef,undef,$args);
+    my $retval = &{$AUTOLOAD}($_[0],$text,undef,undef,undef,$args);
 
     if (defined $retval)
     {
@@ -2891,28 +2990,40 @@ sub AUTOLOAD    # ($parser, $text; $linenum, @args)
     return $retval;
 }
 
-sub _parserepeat($$$$$$$$$$)    # RETURNS A REF TO AN ARRAY OF MATCHES
+sub _parserepeat($$$$$$$$$)    # RETURNS A REF TO AN ARRAY OF MATCHES
 {
-    my ($parser, $text, $prod, $min, $max, $_noactions, $expectation, $argcode) = @_;
+    my ($parser, $text, $prod, $min, $max, $_noactions, $_itempos, $expectation, $argcode) = @_;
     my @tokens = ();
 
+    my $itemposfirst;
     my $reps;
     for ($reps=0; $reps<$max;)
     {
-        $_[6]->at($text);    # $_[6] IS $expectation FROM CALLER
+        $expectation->at($text);
         my $_savetext = $text;
         my $prevtextlen = length $text;
         my $_tok;
-        if (! defined ($_tok = &$prod($parser,$text,1,$_noactions,$argcode)))
+        if (! defined ($_tok = &$prod($parser,$text,1,$_noactions,$_itempos,$argcode)))
         {
             $text = $_savetext;
             last;
         }
+
+        if (defined($_itempos) and !defined($itemposfirst))
+        {
+            $itemposfirst = Parse::RecDescent::Production::_duplicate_itempos($_itempos);
+        }
+
         push @tokens, $_tok if defined $_tok;
         last if ++$reps >= $min and $prevtextlen == length $text;
     }
 
-    do { $_[6]->failed(); return undef} if $reps<$min;
+    do { $expectation->failed(); return undef} if $reps<$min;
+
+    if (defined $itemposfirst)
+    {
+        Parse::RecDescent::Production::_update_itempos($_itempos, $itemposfirst, undef, [qw(from)]);
+    }
 
     $_[1] = $text;
     return [@tokens];
@@ -2996,19 +3107,19 @@ sub _warn($$;$)
     return 0 unless _verbosity("WARN") && ($::RD_HINT || $_[0] >= ($::RD_WARN||1));
     my $errortext   = $_[1];
     my $errorprefix = "Warning" .  ($_[2] ? " (line $_[2])" : "");
-    print ERROR "\n";
+    print {*STDERR} "\n" if _verbosity("HINT");
     $errortext =~ s/\s+/ /g;
-    write ERROR;
+    _write_ERROR($errorprefix, $errortext);
     return 1;
 }
 
 sub _hint($)
 {
     return 0 unless $::RD_HINT;
-    my $errortext = "$_[0])";
-    my $errorprefix = "(Hint";
+    my $errortext = $_[0];
+    my $errorprefix = "Hint" .  ($_[1] ? " (line $_[1])" : "");
     $errortext =~ s/\s+/ /g;
-    write ERROR;
+    _write_ERROR($errorprefix, $errortext);
     return 1;
 }
 
