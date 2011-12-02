@@ -4,6 +4,7 @@ version:            1.966_001
 abstract:           Generate Recursive-Descent Parsers
 author:
     - Damian Conway <DCONWAY@CPAN.org>
+    - Jeremy T. Braun <JTBRAUN@CPAN.org>
 license:            unknown
 distribution_type:  module
 configure_requires:
