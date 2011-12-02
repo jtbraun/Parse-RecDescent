@@ -11,7 +11,7 @@ demo/demo_Cgrammar.pl
 demo/demo_Cgrammar_v2.pl
 demo/demo_LaTeXish.pl
 demo/demo_LaTeXish_autoact.pl
-demo/demo_NL2SQL
+demo/demo_NL2SQL.pl
 demo/demo_OOautoparsetree.pl
 demo/demo_OOparsetree.pl
 demo/demo_PerlCSV.pl
@@ -79,6 +79,7 @@ t/re_capture_return.t
 t/separated_repetition.t
 t/skip.t
 t/skip_dynamic.t
+t/util.pl
 tutorial/TPJ-PRD-proc.gif
 tutorial/TPJ-yacc-proc.gif
 tutorial/TPJ_maze.gif
