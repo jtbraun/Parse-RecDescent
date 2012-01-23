@@ -5,7 +5,7 @@
 # REMOVE COMMENTS FROM C++ CODE
 
 # ORIGINAL BY Helmut Jarausch
-# EXTENDED BY Damian Conway AND Helmut Jarausch
+# EXTENDED BY Damian Conway AND Helmut Jarausch AND Jeremy Braun
 
 use strict;
 use Parse::RecDescent;
@@ -39,6 +39,7 @@ program	: <skip:''> part(s)
 part	: comment
         | C_code
         | string
+        | charlit
 
 C_code  : m{(
 	      [^"/]+		# one or more non-delimiters
@@ -58,6 +59,16 @@ string	: m{"			# a leading delimiter
 	     )*
 	    )
 	    "}x
+		{ $Code .= $item[1]; push @Strings, $1 }
+
+charlit	: m{'			# a leading delimiter
+	    ((			# zero or more...
+	      \\.		# escaped anything
+	      |			# or
+	      [^']		# anything but a delimiter
+	     )*
+	    )
+	    '}x
 		{ $Code .= $item[1]; push @Strings, $1 }
 
 
@@ -90,6 +101,7 @@ int main()
 */
   char *cp1 = "";
   char *cp2 = "cp2";
+  char c3   = 'c';
   int i;  // a counter
           // remove this line altogehter
   int k;
