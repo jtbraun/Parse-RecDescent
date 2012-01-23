@@ -6177,12 +6177,20 @@ L<http://github.com/jtbraun/Parse-RecDescent>
 
 Visit L<http://www.perlfoundation.org/perl5/index.cgi?parse_recdescent> to sign up for the mailing list.
 
-L<http://www.PerlMonks.org> is also a good place to ask questions.
+L<http://www.PerlMonks.org> is also a good place to ask
+questions. Previous posts about Parse::RecDescent can typically be
+found with this search:
+L<http://perlmonks.org/index.pl?node=recdescent>.
 
 =head2 FAQ
 
 Visit L<Parse::RecDescent::FAQ> for answers to frequently (and not so
-frequently) asked questions about Parse::RecDescent
+frequently) asked questions about Parse::RecDescent.
+
+=head2 View/Report Bugs
+
+To view the current bug list or report a new issue visit
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-RecDescent>.
 
 =head1 SEE ALSO
 
