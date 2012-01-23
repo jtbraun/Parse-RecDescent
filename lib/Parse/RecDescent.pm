@@ -1135,9 +1135,9 @@ sub new ($$$$$$)
 
     if (!eval "no strict;
            local \$SIG{__WARN__} = sub {0};
-           '' =~ m$ldel$pattern$rdel" and $@)
+           '' =~ m$ldel$pattern$rdel$mod" and $@)
     {
-        Parse::RecDescent::_warn(3, "Token pattern \"m$ldel$pattern$rdel\"
+        Parse::RecDescent::_warn(3, "Token pattern \"m$ldel$pattern$rdel$mod\"
                          may not be a valid regular expression",
                        $_[5]);
         $@ =~ s/ at \(eval.*/./;

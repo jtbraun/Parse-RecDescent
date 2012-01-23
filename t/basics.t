@@ -6,7 +6,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..21\n"; }
+BEGIN { $| = 1; print "1..25\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Parse::RecDescent;
 $loaded = 1;
@@ -245,3 +245,19 @@ ok($res, "literal");
 #################################################################
 $res = $parser_A->Extend("extended : 'some extension'");
 ok(@{"$parser_A->{namespace}::ISA"} == 1);
+
+#################################################################
+package main;
+
+# Ensure that regex modifiers (like /x below) get interpreted
+$parser = new Parse::RecDescent q
+{
+test : /\.               # a literal period
+        (Test)?
+       /x
+};
+ok($parser) or exit;
+ok($parser->test("."));
+ok($parser->test(".Test"));
+ok($parser->test(".Test"));
+
