@@ -621,3 +621,22 @@ Revision history for Parse-RecDescent
 
     - Removed formats to eliminate problems with filehandle duplication
       in forked environments
+
+1.966_002  Sun Jan 22 19:08:37 2012
+
+    - *** NON-BACKWARDS COMPATIBLE CHANGE! *** Change the caches for
+      $prevline and $thisline to be local to the parser, rather than
+      lexical vars in Parse::RecDescent.  This prevents previously
+      generated parsers from interfering with the line counts of
+      later parsers.
+
+    - removed trailing whitespace from all member files (cosmetic)
+
+    - new tests, updated MANIFEST
+
+    - Added Jeremy Braun as an author and current maintainer
+
+    - update file permissions
+
+    - fixed a few broken links in the pod
+
