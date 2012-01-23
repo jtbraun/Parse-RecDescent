@@ -79,6 +79,7 @@ t/re_capture_return.t
 t/separated_repetition.t
 t/skip.t
 t/skip_dynamic.t
+t/text.t
 t/util.pl
 tutorial/TPJ-PRD-proc.gif
 tutorial/TPJ-yacc-proc.gif
