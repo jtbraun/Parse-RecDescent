@@ -2800,7 +2800,8 @@ sub _generate($$$;$$)
     {
         local $::RD_HINT = defined $::RD_HINT ? $::RD_HINT : 1;
         _hint('Set $::RD_HINT (or -RD_HINT if you\'re using "perl -s")
-               for hints on fixing these problems.');
+               for hints on fixing these problems.  Use $::RD_HINT = 0
+               to disable this message.');
     }
     if ($ERRORS) { $ERRORS=0; return }
     return $self;
