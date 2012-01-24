@@ -4765,7 +4765,7 @@ can be moderated in only one respect: if C<$::RD_TRACE> has an
 integer value (I<N>) greater than 1, only the I<N> characters of
 the "current parsing context" (that is, where in the input string we
 are at any point in the parse) is reported at any time.
-   >
+
 C<$::RD_TRACE> is mainly useful for debugging a grammar that isn't
 behaving as you expected it to. To this end, if C<$::RD_TRACE> is
 defined when a parser is built, any actual parser code which is
