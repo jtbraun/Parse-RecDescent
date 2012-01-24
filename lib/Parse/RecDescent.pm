@@ -3045,8 +3045,11 @@ sub _write_ERROR {
     return if $errortext !~ /\S/;
     $errorprefix =~ s/\s+\Z//;
     local $^A = q{};
-    formline(<<'END_FORMAT', $errorprefix, $errortext, $errortext);
+
+    formline(<<'END_FORMAT', $errorprefix, $errortext);
 @>>>>>>>>>>>>>>>>>>>>: ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+END_FORMAT
+    formline(<<'END_FORMAT', $errortext);
 ~~                     ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 END_FORMAT
     print {*STDERR} $^A;

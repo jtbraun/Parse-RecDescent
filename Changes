@@ -649,3 +649,6 @@ NEXT_RELEASE  NEXT RELEASE DATE
 
     - Added message on how to turn off "default" hint value in the
       default hint value ($::RD_HINT = 0). RT.cpan.org # #4898.
+
+    - Modified _write_ERROR to call formline twice to avoid repeated
+      $errorprefix.
