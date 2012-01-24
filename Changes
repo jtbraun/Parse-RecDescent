@@ -645,3 +645,4 @@ NEXT_RELEASE  NEXT RELEASE DATE
     - Addressed RT.cpan.org #28314: regex modifiers for tokens not
       honored during regex syntax check. (Thanks SADAHIRO!)
 
+    - Fixed some POD typos

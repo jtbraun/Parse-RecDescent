@@ -3741,7 +3741,7 @@ C<number> subrule. In other words, successive calls to a subrule
 overwrite the corresponding entry in C<%item>. Once again, the
 solution is to rename each subrule in its own rule:
 
-    range: '(' from_num '..' to_num )'
+    range: '(' from_num '..' to_num ')'
         { $return = $item{from_num} }
 
     from_num: number
