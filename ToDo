@@ -8,7 +8,7 @@ Global <skip:...>
 Completion support
 
 Ted Zlatanov to recdescent:
-	
+
 Maybe P::RD could have better built-in completion support,
 similar to the way <autotree> works: something you can access when a
 rule fails that tells you how far it got and what was successfully
@@ -159,7 +159,7 @@ always match first)"
 
   This would avoid rematching items 1 to 4 of the 2nd prod,
   by just reusing @item[1..4] from the previous production
-  
+
   Document use of simple <reject> to subvert CPE. E.g.:
 
     ifstat: 'if' cond 'then' stat 'else' stat 'endif'
@@ -258,7 +258,7 @@ different namespaces. For example:
     <namespace: general>
 
         startrule: rule(s)
-    
+
             rules: R1::rule | R2::rule | R3::rule
 
     <namespace: R1>
@@ -267,7 +267,7 @@ different namespaces. For example:
 
     <namespace: R2>
 
-        rule: middle suffix 
+        rule: middle suffix
 
     <namespace: R3>
 
@@ -278,7 +278,7 @@ different namespaces. For example:
         prefix: /blah/ blah 'blah'
         middle: /BLAH/ BLAH 'BLAH'
         suffix: /blah/ blah 'blah'
-    
+
 Apart from the obvious benefit of allowing names to be reused, this would also
 solve your precompilation problem, since the various namespaces would be
 compiled as separate modules. The Precompile method would then take an extra
@@ -371,5 +371,20 @@ END_OF_GRAMMAR
   or die "Can't compile grammar\n";
 -------------------------------------------------------
 
+-----cut----------cut----------cut----------cut----------cut----------cut-----
 
+This grammar reports back:
+  ['xxx', 'zzzz']
+rather than the expected:
+  ['xxx', 'xxx']
 
+-------------------------------------------------------
+my $parser = new Parse::RecDescent (q {
+startrule : id ',' id(s /,/)  {
+  $return = [$item[1], $item{id}]
+}
+
+id : /\w+/ }) || die $@;
+my $text = 'xxx,yyyy,zzzz';
+print Dumper $parser->startrule(\$text);
+-------------------------------------------------------
