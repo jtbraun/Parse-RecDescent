@@ -443,7 +443,7 @@ sub ' . $namespace . '::' . $self->{"name"} .  '
             : '') . '
 
         $_[1] = $text;  # NOT SURE THIS IS NEEDED
-        Parse::RecDescent::_trace(q{<<Didn\'t match rule>>},
+        Parse::RecDescent::_trace(q{<<'.Parse::RecDescent::_matchtracemessage($self,1).' rule>>},
                      Parse::RecDescent::_tracefirst($_[1]),
                      q{' . $self->{"name"} .'},
                      $tracelevel)
@@ -462,7 +462,7 @@ sub ' . $namespace . '::' . $self->{"name"} .  '
     $return = $item[$#item] unless defined $return;
     if (defined $::RD_TRACE)
     {
-        Parse::RecDescent::_trace(q{>>Matched rule<< (return value: [} .
+        Parse::RecDescent::_trace(q{>>'.Parse::RecDescent::_matchtracemessage($self).' rule<< (return value: [} .
                       $return . q{])}, "",
                       q{' . $self->{"name"} .'},
                       $tracelevel);
@@ -873,7 +873,7 @@ sub code($$$$)
 
     $code .=
 '
-        Parse::RecDescent::_trace(q{>>Matched production: ['
+        Parse::RecDescent::_trace(q{>>'.Parse::RecDescent::_matchtracemessage($self).' production: ['
                       . $self->describe . ']<<},
                       Parse::RecDescent::_tracefirst($text),
                       q{' . $rule->{name} . '},
@@ -933,11 +933,11 @@ sub code($$$$)
         $_tok = ($_noactions) ? 0 : do ' . $self->{"code"} . ';
         ' . ($self->{"lookahead"}<0?'if':'unless') . ' (defined $_tok)
         {
-            Parse::RecDescent::_trace(q{<<Didn\'t match action>> (return value: [undef])})
+            Parse::RecDescent::_trace(q{<<'.Parse::RecDescent::_matchtracemessage($self,1).' action>> (return value: [undef])})
                     if defined $::RD_TRACE;
             last;
         }
-        Parse::RecDescent::_trace(q{>>Matched action<< (return value: [}
+        Parse::RecDescent::_trace(q{>>'.Parse::RecDescent::_matchtracemessage($self).' action<< (return value: [}
                       . $_tok . q{])},
                       Parse::RecDescent::_tracefirst($text))
                         if defined $::RD_TRACE;
@@ -986,14 +986,14 @@ sub code($$$$)
         $_tok = do { ' . $self->{"code"} . ' };
         if (defined($_tok))
         {
-            Parse::RecDescent::_trace(q{>>Matched directive<< (return value: [}
+            Parse::RecDescent::_trace(q{>>'.Parse::RecDescent::_matchtracemessage($self).' directive<< (return value: [}
                         . $_tok . q{])},
                         Parse::RecDescent::_tracefirst($text))
                             if defined $::RD_TRACE;
         }
         else
         {
-            Parse::RecDescent::_trace(q{<<Didn\'t match directive>>},
+            Parse::RecDescent::_trace(q{<<'.Parse::RecDescent::_matchtracemessage($self,1).' directive>>},
                         Parse::RecDescent::_tracefirst($text))
                             if defined $::RD_TRACE;
         }
@@ -1424,7 +1424,7 @@ sub code($$$$)
         . ')))
         {
             '.($self->{"lookahead"} ? '$text = $_savetext;' : '').'
-            Parse::RecDescent::_trace(q{<<Didn\'t match subrule: ['
+            Parse::RecDescent::_trace(q{<<'.Parse::RecDescent::_matchtracemessage($self,1).' subrule: ['
             . $self->{subrule} . ']>>},
                           Parse::RecDescent::_tracefirst($text),
                           q{' . $rule->{"name"} .'},
@@ -1433,7 +1433,7 @@ sub code($$$$)
             $expectation->failed();
             last;
         }
-        Parse::RecDescent::_trace(q{>>Matched subrule: ['
+        Parse::RecDescent::_trace(q{>>'.Parse::RecDescent::_matchtracemessage($self).' subrule: ['
                     . $self->{subrule} . ']<< (return value: [}
                     . $_tok . q{]},
 
@@ -1540,7 +1540,7 @@ sub code($$$$)
                         : 'sub { \\@arg }')
         . ')))
         {
-            Parse::RecDescent::_trace(q{<<Didn\'t match repeated subrule: ['
+            Parse::RecDescent::_trace(q{<<'.Parse::RecDescent::_matchtracemessage($self,1).' repeated subrule: ['
             . $self->describe . ']>>},
                           Parse::RecDescent::_tracefirst($text),
                           q{' . $rule->{"name"} .'},
@@ -1548,7 +1548,7 @@ sub code($$$$)
                             if defined $::RD_TRACE;
             last;
         }
-        Parse::RecDescent::_trace(q{>>Matched repeated subrule: ['
+        Parse::RecDescent::_trace(q{>>'.Parse::RecDescent::_matchtracemessage($self).' repeated subrule: ['
                     . $self->{subrule} . ']<< (}
                     . @$_tok . q{ times)},
 
@@ -1740,7 +1740,7 @@ sub code($$$$)
     $code .= '
         unless ($repcount>='.$self->{min}.')
         {
-            Parse::RecDescent::_trace(q{<<Didn\'t match operator: ['
+            Parse::RecDescent::_trace(q{<<'.Parse::RecDescent::_matchtracemessage($self,1).' operator: ['
                           . $self->describe
                           . ']>>},
                           Parse::RecDescent::_tracefirst($text),
@@ -1750,7 +1750,7 @@ sub code($$$$)
             $expectation->failed();
             last;
         }
-        Parse::RecDescent::_trace(q{>>Matched operator: ['
+        Parse::RecDescent::_trace(q{>>'.Parse::RecDescent::_matchtracemessage($self).' operator: ['
                       . $self->describe
                       . ']<< (return value: [}
                       . qq{@{$_tok||[]}} . q{]},
@@ -3192,6 +3192,27 @@ sub _trace($;$$$)
         }
         _write_TRACECONTEXT($tracelevel, $tracerulename, $tracecontext);
     }
+}
+
+sub _matchtracemessage
+{
+    my ($self, $reject) = @_;
+
+    my $prefix = '';
+    my $postfix = '';
+    my $matched = not $reject;
+    my @t = ("Matched", "Didn't match");
+    if (exists $self->{lookahead} and $self->{lookahead})
+    {
+        $postfix = $reject ? "(reject)" : "(keep)";
+        $prefix = "...";
+        if ($self->{lookahead} < 0)
+        {
+            $prefix .= '!';
+            $matched = not $matched;
+        }
+    }
+    $prefix . ($matched ? $t[0] : $t[1]) . $postfix;
 }
 
 sub _parseunneg($$$$$)

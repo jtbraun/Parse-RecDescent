@@ -652,3 +652,6 @@ NEXT_RELEASE  NEXT RELEASE DATE
 
     - Modified _write_ERROR to call formline twice to avoid repeated
       $errorprefix.
+
+    - Collected match tracing messages into a common function which
+      takes into account positive/negative lookahead.
