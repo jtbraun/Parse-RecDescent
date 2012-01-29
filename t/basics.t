@@ -6,7 +6,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..25\n"; }
+BEGIN { $| = 1; print "1..28\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Parse::RecDescent;
 $loaded = 1;
@@ -261,3 +261,13 @@ ok($parser->test("."));
 ok($parser->test(".Test"));
 ok($parser->test(".Test"));
 
+
+#################################################################
+$parser = new Parse::RecDescent q
+{
+   whatever : /\\\\/ | /whatever/
+};
+ok ($parser) or exit;
+
+ok($parser->whatever(" \\ "));
+ok($parser->whatever(" whatever "));
