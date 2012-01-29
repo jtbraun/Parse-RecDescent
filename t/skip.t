@@ -1,4 +1,3 @@
-#!/opt/perl/bin/perl
 use strict;
 use warnings;
 use Parse::RecDescent;
