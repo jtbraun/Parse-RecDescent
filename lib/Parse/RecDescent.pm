@@ -63,7 +63,10 @@ sub Precompile
                  "to class $class in module file '$modulefile'\n"
                     if $grammar && $sourcefile;
 
-        $self = Parse::RecDescent->new($grammar,1,$class)
+        $self = Parse::RecDescent->new($grammar, # $grammar
+                                       1,        # $compiling
+                                       $class    # $namespace
+                                 )
             || croak("Can't compile bad grammar")
                 if $grammar;
 
@@ -1835,7 +1838,8 @@ sub _nextnamespace()
     return "Parse::RecDescent::" . $nextnamespace++;
 }
 
-sub new ($$$)
+# ARGS ARE: $class, $grammar, $compiling, $namespace
+sub new ($$$$)
 {
     my $class = ref($_[0]) || $_[0];
     local $Parse::RecDescent::compiling = $_[2];
@@ -1864,12 +1868,10 @@ sub new ($$$)
     }
 
     bless $self, $class;
-    shift;
-    return $self->Replace(@_)
+    return $self->Replace($_[1])
 }
 
 sub Compile($$$$) {
-
     die "Compilation of Parse::RecDescent grammars not yet implemented\n";
 }
 
@@ -1884,15 +1886,21 @@ sub DESTROY {
 
 # BUILDING A GRAMMAR....
 
+# ARGS ARE: $self, $grammar, $isimplicit, $isleftop
 sub Replace ($$)
 {
+    # set $replace = 1 for _generate
     splice(@_, 2, 0, 1);
+
     return _generate(@_);
 }
 
+# ARGS ARE: $self, $grammar, $isimplicit, $isleftop
 sub Extend ($$)
 {
+    # set $replace = 0 for _generate
     splice(@_, 2, 0, 0);
+
     return _generate(@_);
 }
 
@@ -2875,7 +2883,10 @@ sub _check_grammar ($)
                 }
                 else    # EXPERIMENTAL
                 {
-                    my $rule = $::RD_AUTOSTUB || qq{'$call'};
+                    my $rule = qq{'$call'};
+                    if ($::RD_AUTOSTUB and $::RD_AUTOSTUB ne "1") {
+                        $rule = $::RD_AUTOSTUB;
+                    }
                     _warn(1,"Autogenerating rule: $call")
                     and
                     _hint("A call was made to a subrule
@@ -2886,7 +2897,7 @@ sub _check_grammar ($)
                            ($call : $rule) was
                            automatically created.");
 
-                    $self->_generate("$call : $rule",0,1);
+                    $self->_generate("$call: $rule",0,1);
                 }
             }
         }
@@ -4270,18 +4281,30 @@ et cetera.
 
 Early in prototyping, many such "stubs" may be required, so
 C<Parse::RecDescent> provides a means of automating their definition.
-If the variable C<$::RD_AUTOSTUB> is defined when a parser is built,
-a subrule reference to any non-existent rule (say, C<sr>),
-causes a "stub" rule of the form:
+If the variable C<$::RD_AUTOSTUB> is defined when a parser is built, a
+subrule reference to any non-existent rule (say, C<subrule>), will
+cause a "stub" rule to be automatically defined in the generated
+parser.  If C<$::RD_AUTOSTUB eq '1'> or is false, a stub rule of the
+form:
 
-    sr: 'sr'
+    subrule: 'subrule'
 
-to be automatically defined in the generated parser.
-A level 1 warning is issued for each such "autostubbed" rule.
+will be generated.  The special-case for a value of C<'1'> is to allow
+the use of the B<perl -s> with B<-RD_AUTOSTUB> without generating
+C<subrule: '1'> per below. If C<$::RD_AUTOSTUB> is true, a stub rule
+of the form:
 
-Hence, with C<$::AUTOSTUB> defined, it is possible to only partially
-specify a grammar, and then "fake" matches of the unspecified
-(sub)rules by just typing in their name.
+    subrule: $::RD_AUTOSTUB
+
+will be generated.  C<$::RD_AUTOSTUB> must contain a valid production
+item, no checking is performed.  No lazy evaluation of
+C<$::RD_AUTOSTUB> is performed, it is evaluated at the time the Parser
+is generated.
+
+Hence, with C<$::RD_AUTOSTUB> defined, it is possible to only
+partially specify a grammar, and then "fake" matches of the
+unspecified (sub)rules by just typing in their name, or a literal
+value that was assigned to C<$::RD_AUTOSTUB>.
 
 
 

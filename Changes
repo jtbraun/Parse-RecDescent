@@ -655,3 +655,15 @@ NEXT_RELEASE  NEXT RELEASE DATE
 
     - Collected match tracing messages into a common function which
       takes into account positive/negative lookahead.
+
+    - Addressed RT.cpan.org #74258: RD_AUTOSTUB does not work with
+      precompiled parsers.  (Thanks Yuri!)
+
+      - Special-case $::RD_AUTOSTUB eq 1.  $::RD_AUTOSTUB's value is
+        ignored, and the unknown subrule 'rule' has a production
+        "rule: 'rule'", rather than "rule: '1'".
+
+      - Change Parse::RecDescent::new to call $self->Replace with only
+        the grammar as an argument.  That prevents the $compiling
+        argument to new() from being incorrectly interpreted as
+        $isimplicit.
