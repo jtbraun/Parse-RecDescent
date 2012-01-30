@@ -668,7 +668,7 @@ Revision history for Parse-RecDescent
         argument to new() from being incorrectly interpreted as
         $isimplicit.
 
-NEXT_RELEASE    NEXT_RELEASEDATE
+1.967002  Sun Jan 29 19:13:04 2012
 
     - Addressed RT.cpan.org #29966: regex with single backslash not
       recognized.  Changed the definition of $TOKEN to handle
