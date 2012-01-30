@@ -679,4 +679,4 @@ Revision history for Parse-RecDescent
 1.967003  Mon Jan 30 07:24:53 2012
 
     - Remove the 'use 5.10' from t/skip_dynamic.t, it runs fine
-      against Perl 5.8.9.
+      against Perl 5.8.9. (Thanks Slaven!)
