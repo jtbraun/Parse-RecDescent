@@ -1,6 +1,5 @@
 #! /usr/bin/perl -w
 use strict;
-use 5.010;
 use warnings;
 use Parse::RecDescent;
 use Test::More tests => 3;
