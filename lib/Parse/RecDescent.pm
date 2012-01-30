@@ -1826,7 +1826,7 @@ use vars qw ( $AUTOLOAD $VERSION );
 
 my $ERRORS = 0;
 
-our $VERSION = '1.967002';
+our $VERSION = '1.967003';
 $VERSION = eval $VERSION;
 
 # BUILDING A PARSER
@@ -3283,7 +3283,7 @@ Parse::RecDescent - Generate Recursive-Descent Parsers
 
 =head1 VERSION
 
-This document describes version 1.967002 of Parse::RecDescent
+This document describes version 1.967003 of Parse::RecDescent
 released January 29th, 2012.
 
 =head1 SYNOPSIS
