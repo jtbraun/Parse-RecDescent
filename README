@@ -1,4 +1,4 @@
-Parse::RecDescent version 1.966_002
+Parse::RecDescent version 1.967002
 
 NAME
 
@@ -54,7 +54,7 @@ INSTALLATION
 
 CHANGES AND FUTURE DEVELOPMENT
 
-    This readme refers to versions 1.XX.
+    This readme refers to versions 1.XXXXXX.
     For details of changes, refer to the file Changes.
 
     Version 2.00 will provide a cleaner interface and better
@@ -63,7 +63,8 @@ CHANGES AND FUTURE DEVELOPMENT
 
 AUTHOR
 
-    Damian Conway (damian@csse.monash.edu.au)
+    Damian Conway (damian@conway.org)
+    Jeremy T. Braun (JTBRAUN@CPAN.org) [current maintainer]
 
 
 INSTALLATION
@@ -78,16 +79,10 @@ To install this module, run the following commands:
 
 Alternatively, to install with Module::Build, you can use the following commands:
 
-    perl Build.PL
-    ./Build
-    ./Build test
-    ./Build install
-
-
-
-DEPENDENCIES
-
-None.
+    perl Makefile.PL
+    make
+    make test
+    make install
 
 
 COPYRIGHT AND LICENCE
