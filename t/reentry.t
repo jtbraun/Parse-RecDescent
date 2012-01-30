@@ -4,7 +4,8 @@ use strict;
 $^W++; # for some reason use warnings doesn't cut it
 
 use Test::More;
-use Test::Warn;
+eval "use Test::Warn";
+plan skip_all => "Test::Warn required for testing reentry" if $@;
 
 use Parse::RecDescent;
 

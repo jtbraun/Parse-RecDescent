@@ -673,3 +673,5 @@ NEXT_RELEASE    NEXT_RELEASEDATE
     - Addressed RT.cpan.org #29966: regex with single backslash not
       recognized.  Changed the definition of $TOKEN to handle
       backslashes inside of regex patterns.
+
+    - Skip tests in t/reentry.t if Test::Warn isn't available.
