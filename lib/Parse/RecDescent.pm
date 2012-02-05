@@ -56,6 +56,7 @@ sub Precompile
         $modulefile =~ s/.*:://;
         $modulefile .= ".pm";
 
+        local *OUT;
         open OUT, ">", $modulefile
             or croak("Can't write to new module file '$modulefile'");
 

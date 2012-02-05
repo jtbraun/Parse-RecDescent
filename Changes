@@ -680,3 +680,7 @@ Revision history for Parse-RecDescent
 
     - Remove the 'use 5.10' from t/skip_dynamic.t, it runs fine
       against Perl 5.8.9. (Thanks Slaven!)
+
+NEXT_VERSION  NEXT_RELEASE
+
+    - Localize the OUT filehandle during Precompile.
