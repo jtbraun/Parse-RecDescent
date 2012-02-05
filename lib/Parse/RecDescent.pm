@@ -2258,11 +2258,16 @@ sub _generate($$$;$$)
             {
                 _parse("a skip marker", $aftererror,$line, $code );
                 $code =~ /\A\s*<skip:(.*)>\Z/s;
-                $item = new Parse::RecDescent::Directive(
-                          'my $oldskip = $skip; $skip='.$1.'; $oldskip',
-                          $lookahead,$line,$code);
-                $prod and $prod->additem($item)
+                if ($rule) {
+                    $item = new Parse::RecDescent::Directive(
+                        'my $oldskip = $skip; $skip='.$1.'; $oldskip',
+                        $lookahead,$line,$code);
+                    $prod and $prod->additem($item)
                       or  _no_rule($code,$line);
+                } else {
+                    #global <skip> directive
+                    $self->{skip} = $1;
+                }
             }
             elsif ($grammar =~ m/(?=$RULEVARPATMK)/gco
                 and do { ($code) = extract_codeblock($grammar,'{',undef,'<');
@@ -2922,12 +2927,14 @@ sub _check_grammar ($)
 sub _code($)
 {
     my $self = shift;
+    my $initial_skip = defined($self->{skip}) ? $self->{skip} : $skip;
+
     my $code = qq{
 package $self->{namespace};
 use strict;
 use vars qw(\$skip \$AUTOLOAD $self->{localvars} );
 \@$self->{namespace}\::ISA = ();
-\$skip = '$skip';
+\$skip = '$initial_skip';
 $self->{startcode}
 
 {
@@ -3652,9 +3659,11 @@ prefix, which is the default for all terminal matches in all parsers
 built with C<Parse::RecDescent>.
 
 If you want to change the universal prefix using
-C<$Parse::RecDescent::skip>, be careful to set it I<before> creating the
-grammar object, because it is applied statically (when a grammar is
-built) rather than dynamically (when the grammar is used).
+C<$Parse::RecDescent::skip>, be careful to set it I<before> creating
+the grammar object, because it is applied statically (when a grammar
+is built) rather than dynamically (when the grammar is used).
+Alternatively you can provide a global C<E<lt>skip:...E<gt>> directive
+in your grammar before any rules (described later).
 
 The prefix for an individual production can be altered
 by using the C<E<lt>skip:...E<gt>> directive (described later).
@@ -4246,7 +4255,7 @@ structure like this:
 (except, of course, that each nested hash would also be blessed into
 the appropriate class).
 
-You can also specify a base class for the C<<autotree>> directive.
+You can also specify a base class for the C<E<lt>autotreeE<gt>> directive.
 The supplied prefix will be prepended to the rule names when creating
 tree nodes.  The following are equivalent:
 
@@ -4555,8 +4564,11 @@ or, better:
 
 The skip pattern is passed down to subrules, so setting the skip for
 the top-level rule as described above actually sets the prefix for the
-entire grammar (provided that you only call the method corresponding to
-the top-level rule itself). This is the preferred alternative to setting
+entire grammar (provided that you only call the method corresponding
+to the top-level rule itself). Alternatively, or if you have more than
+one top-level rule in your grammar, you can provide a global
+C<E<lt>skipE<gt>> directive prior to defining any rules in the
+grammar. These are the preferred alternatives to setting
 C<$Parse::RecDescent::skip>.
 
 Additionally, using C<E<lt>skipE<gt>> actually allows you to have

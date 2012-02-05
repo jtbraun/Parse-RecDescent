@@ -692,3 +692,6 @@ NEXT_VERSION  NEXT_RELEASE
       t/autotree.t.  Renamed basics.t to ensure it runs before
       autotree.t.
 
+    - Allow a global <skip:> directive that functions the same as
+      modifying $Parse::RecDescent::skip prior to compiling a
+      grammar. (Thanks Flavio!)
