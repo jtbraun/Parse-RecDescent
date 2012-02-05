@@ -71,7 +71,8 @@ demo/demo_undumper.pl
 demo/demo_whoson.pl
 lib/Parse/RecDescent.pm
 t/00.load.t
-t/basics.t
+t/01.basics.t
+t/autotree.t
 t/leftop_cap.t
 t/pod.t
 t/re_capture_return.t

@@ -4246,6 +4246,16 @@ structure like this:
 (except, of course, that each nested hash would also be blessed into
 the appropriate class).
 
+You can also specify a base class for the C<<autotree>> directive.
+The supplied prefix will be prepended to the rule names when creating
+tree nodes.  The following are equivalent:
+
+    <autotree:MyBase::Class>
+    <autotree:MyBase::Class::>
+
+And will produce a root node blessed into the C<MyBase::Class::file>
+package in the example above.
+
 
 =head2 Autostubbing
 

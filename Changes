@@ -684,3 +684,11 @@ Revision history for Parse-RecDescent
 NEXT_VERSION  NEXT_RELEASE
 
     - Localize the OUT filehandle during Precompile.
+
+    - Document the <autotree:Base::Class> form of the <autotree>
+      directive.
+
+    - Provide a simple test for the <autotree> directive,
+      t/autotree.t.  Renamed basics.t to ensure it runs before
+      autotree.t.
+
