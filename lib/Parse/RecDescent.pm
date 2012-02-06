@@ -14,6 +14,7 @@ use vars qw ( $skip );
 my $MAXREP  = 100_000_000;  # REPETITIONS MATCH AT MOST 100,000,000 TIMES
 
 
+#ifndef RUNTIME
 sub import  # IMPLEMENT PRECOMPILER BEHAVIOUR UNDER:
         #    perl -MParse::RecDescent - <grammarfile> <classname>
 {
@@ -48,52 +49,87 @@ sub Save
 
 sub Precompile
 {
-        my ($self, $grammar, $class, $sourcefile) = @_;
+    my ($self, $grammar, $class, $sourcefile) = @_;
+    my $opt = {-standalone => 1}; # TODO: for future named option expansion
 
-        $class =~ /^(\w+::)*\w+$/ or croak("Bad class name: $class");
+    $class =~ /^(\w+::)*\w+$/ or croak("Bad class name: $class");
 
-        my $modulefile = $class;
-        $modulefile =~ s/.*:://;
-        $modulefile .= ".pm";
+    my $modulefile = $class;
+    $modulefile =~ s/.*:://;
+    $modulefile .= ".pm";
 
-        local *OUT;
-        open OUT, ">", $modulefile
-            or croak("Can't write to new module file '$modulefile'");
+    local *OUT;
+    open OUT, ">", $modulefile
+      or croak("Can't write to new module file '$modulefile'");
 
-        print STDERR "precompiling grammar from file '$sourcefile'\n",
-                 "to class $class in module file '$modulefile'\n"
-                    if $grammar && $sourcefile;
+    print STDERR "precompiling grammar from file '$sourcefile'\n",
+      "to class $class in module file '$modulefile'\n"
+      if $grammar && $sourcefile;
 
-        $self = Parse::RecDescent->new($grammar, # $grammar
-                                       1,        # $compiling
-                                       $class    # $namespace
-                                 )
-            || croak("Can't compile bad grammar")
-                if $grammar;
+    # Make the resulting pre-compiled parser stand-alone by
+    # including the contents of Parse::RecDescent as
+    # Parse::RecDescent::Runtime in the resulting precompiled
+    # parser.
+    if ($opt->{-standalone}) {
+        local *IN;
+        open IN, '<', $Parse::RecDescent::_FILENAME
+          or croak("Can't open Parse::RecDescent for standalone pre-compilation: $!\n");
+        my $exclude = 0;
+        print OUT "{\n";
+        while (<IN>) {
+            if ($_ =~ /^\s*#\s*ifndef\s+RUNTIME\s*$/) {
+                ++$exclude;
+            }
+            if ($exclude) {
+                if ($_ =~ /^\s*#\s*endif\s$/) {
+                    --$exclude;
+                }
+            } else {
+                if ($_ =~ m/^__END__/) {
+                    last;
+                }
+                print OUT $_;
+            }
+        }
+        close IN;
+        print OUT "}\n";
+    }
 
-        $self->{_precompiled} = 1;
+    $self = Parse::RecDescent->new($grammar,  # $grammar
+                                   1,         # $compiling
+                                   $class     # $namespace
+                             )
+      || croak("Can't compile bad grammar")
+      if $grammar;
 
-        foreach ( keys %{$self->{rules}} )
-            { $self->{rules}{$_}{changed} = 1 }
+    $self->{_precompiled} = 1;
 
-        print OUT "package $class;\nuse Parse::RecDescent;\n\n";
+    foreach ( keys %{$self->{rules}} ) {
+        $self->{rules}{$_}{changed} = 1;
+    }
 
-        print OUT "{ my \$ERRORS;\n\n";
 
-        print OUT $self->_code();
+    print OUT "package $class;\n";
+    if (not $opt->{-standalone}) {
+        print OUT "use Parse::RecDescent;\n";
+    }
 
-        print OUT "}\npackage $class; sub new { ";
-        print OUT "my ";
+    print OUT "{ my \$ERRORS;\n\n";
 
-        require Data::Dumper;
-        print OUT Data::Dumper->Dump([$self], [qw(self)]);
+    print OUT $self->_code();
 
-        print OUT "}";
+    print OUT "}\npackage $class; sub new { ";
+    print OUT "my ";
 
-        close OUT
-            or croak("Can't write to new module file '$modulefile'");
+    require Data::Dumper;
+    print OUT Data::Dumper->Dump([$self], [qw(self)]);
+
+    print OUT "}";
+
+    close OUT
+      or croak("Can't write to new module file '$modulefile'");
 }
-
+#endif
 
 package Parse::RecDescent::LineCounter;
 
@@ -1823,12 +1859,13 @@ sub message ($)
 package Parse::RecDescent;
 
 use Carp;
-use vars qw ( $AUTOLOAD $VERSION );
+use vars qw ( $AUTOLOAD $VERSION $_FILENAME);
 
 my $ERRORS = 0;
 
 our $VERSION = '1.967003';
 $VERSION = eval $VERSION;
+$_FILENAME=__FILE__;
 
 # BUILDING A PARSER
 
@@ -1971,7 +2008,7 @@ my $OTHER       = '\G\s*([^\s]+)';
 
 my @lines = 0;
 
-sub _generate($$$;$$)
+sub _generate
 {
     my ($self, $grammar, $replace, $isimplicit, $isleftop) = (@_, 0);
 

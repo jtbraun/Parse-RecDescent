@@ -388,3 +388,13 @@ id : /\w+/ }) || die $@;
 my $text = 'xxx,yyyy,zzzz';
 print Dumper $parser->startrule(\$text);
 -------------------------------------------------------
+
+-----cut----------cut----------cut----------cut----------cut----------cut-----
+
+Support named options to Precompile and other public methods
+
+-----cut----------cut----------cut----------cut----------cut----------cut-----
+
+Separate out "runtime" stuff to avoid the "#ifndef RUNTIME" hack
+inside of Precompile.
+

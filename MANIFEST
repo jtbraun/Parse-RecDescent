@@ -74,6 +74,7 @@ t/00.load.t
 t/basics.t
 t/leftop_cap.t
 t/pod.t
+t/precompile.t
 t/re_capture_return.t
 t/reentry.t
 t/separated_repetition.t

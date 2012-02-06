@@ -684,3 +684,25 @@ Revision history for Parse-RecDescent
 NEXT_VERSION  NEXT_RELEASE
 
     - Localize the OUT filehandle during Precompile.
+
+    - When precompiling, create a standalone parser by including most
+      of the contents of Parse::RecDescent in the resulting Precompiled
+      output.
+
+      - Lay the groundwork for creating both standalone and dependent
+        parsers in the future by conditioning the new behavior on
+        $opt->{-standalone}, which is always true, currently.
+
+      - The subroutines import, Precompile and Save are not included
+        in the Precompile'd parser.
+
+      - Add a new t/precompile.t to test precompilation.
+
+      - Add a new $_FILENAME global to Parse::RecDescent to make it
+        easy for the Precompile method to find the module.
+
+      - Remove the prototype from _generate.  It is not required, and
+        it caused t/precompile.t (which ends up re-definiing a lot of
+        Parse::RecDescent subroutines) to fail needlessly, as the
+        calls to _generate in Replace and Extend normally do not see
+        the prototype, but do when re-defined.
