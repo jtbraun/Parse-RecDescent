@@ -340,6 +340,9 @@ END_OF_GRAMMAR
   or die "Can't compile grammar\n";
 -------------------------------------------------------
 
+This is caused by a bug in Text::Balanced:
+https://rt.cpan.org/Ticket/Display.html?id=74714
+
 -----cut----------cut----------cut----------cut----------cut----------cut-----
 
 This grammar reports back:
