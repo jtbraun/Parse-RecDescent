@@ -685,6 +685,42 @@ NEXT_VERSION  NEXT_RELEASE
 
     - Localize the OUT filehandle during Precompile.
 
+    - Document the <autotree:Base::Class> form of the <autotree>
+      directive.
+
+    - Provide a simple test for the <autotree> directive,
+      t/autotree.t.  Renamed basics.t to ensure it runs before
+      autotree.t.
+
+    - Allow a global <skip:> directive that functions the same as
+      modifying $Parse::RecDescent::skip prior to compiling a
+      grammar. (Thanks Flavio!)
+
+    - Require that the $file returned by caller() be eq '-', rather than merely
+      starting with '-'.  This allows execution of the following.  (Thanks Christopher)
+        perl -MParse::RecDescent -e 'print "$Parse::RecDescent::VERSION\n";'
+
+    - Warn on empty productions followed by other productions.  The
+      empty production always matches, so following productions will
+      never be reached.
+
+    - *** NON-BACKWARDS COMPATIBLE CHANGE! *** A repetition directive
+      such as 'id(s /,/)' correctly creates a temporary @item variable
+      to hold the 'id's that are matched.  That @item variable is them
+      used to set the real $item[] entry for that repetition.  The
+      same treatment is now given to %item.  Formerly, in a production like:
+
+          id ',' id(s /,/)
+
+      matched against:
+
+          xxx, yyy, zzz
+
+      The $item{id} entry which should be 'xxx' is overwritten by
+      'yyy' and then 'zzz' prior to the action being executed.  Now
+      'yyy' and 'zzz' set $item{id}, but in the private %item, which
+      goes out of scope once the repetition match completes.
+
     - When precompiling, create a standalone parser by including most
       of the contents of Parse::RecDescent in the resulting Precompiled
       output.
@@ -706,3 +742,4 @@ NEXT_VERSION  NEXT_RELEASE
         Parse::RecDescent subroutines) to fail needlessly, as the
         calls to _generate in Replace and Extend normally do not see
         the prototype, but do when re-defined.
+

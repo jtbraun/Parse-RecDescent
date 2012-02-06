@@ -1,10 +1,4 @@
 -----cut----------cut----------cut----------cut----------cut----------cut-----
-
-
-Global <skip:...>
-
-
------cut----------cut----------cut----------cut----------cut----------cut-----
 Completion support
 
 Ted Zlatanov to recdescent:
@@ -13,25 +7,6 @@ Maybe P::RD could have better built-in completion support,
 similar to the way <autotree> works: something you can access when a
 rule fails that tells you how far it got and what was successfully
 parsed.  Basically a $was_expecting variable, set automatically.
-
------cut----------cut----------cut----------cut----------cut----------cut-----
-
-> How can I tell which version of Parse::RecDescent is installed? Usually
-> I do something like this:
->
->        perl -MParse::RecDescent -e 'print
-> "$Parse::RecDescent::VERSION\n";'
->
-> but that doesn't work with this module.
-
-Christopher
-
-No, it doesn't. I'll look at allowing it to work in future releases.
-For now, use:
-
-    perldoc -mT Parse::RecDescent | grep VERSION
-
-Damian
 
 -----cut----------cut----------cut----------cut----------cut----------cut-----
 
@@ -121,12 +96,6 @@ definition
 ================================================================================
 
 Update meta-grammar to capture current features
-
-================================================================================
-
-Warn on empty productions followed by other productions:
-"Production %s will never be reached (preceding empty production will
-always match first)"
 
 ================================================================================
 
@@ -371,23 +340,8 @@ END_OF_GRAMMAR
   or die "Can't compile grammar\n";
 -------------------------------------------------------
 
------cut----------cut----------cut----------cut----------cut----------cut-----
-
-This grammar reports back:
-  ['xxx', 'zzzz']
-rather than the expected:
-  ['xxx', 'xxx']
-
--------------------------------------------------------
-my $parser = new Parse::RecDescent (q {
-startrule : id ',' id(s /,/)  {
-  $return = [$item[1], $item{id}]
-}
-
-id : /\w+/ }) || die $@;
-my $text = 'xxx,yyyy,zzzz';
-print Dumper $parser->startrule(\$text);
--------------------------------------------------------
+This is caused by a bug in Text::Balanced:
+https://rt.cpan.org/Ticket/Display.html?id=74714
 
 -----cut----------cut----------cut----------cut----------cut----------cut-----
 
@@ -397,4 +351,3 @@ Support named options to Precompile and other public methods
 
 Separate out "runtime" stuff to avoid the "#ifndef RUNTIME" hack
 inside of Precompile.
-
