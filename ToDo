@@ -342,21 +342,3 @@ END_OF_GRAMMAR
 
 This is caused by a bug in Text::Balanced:
 https://rt.cpan.org/Ticket/Display.html?id=74714
-
------cut----------cut----------cut----------cut----------cut----------cut-----
-
-This grammar reports back:
-  ['xxx', 'zzzz']
-rather than the expected:
-  ['xxx', 'xxx']
-
--------------------------------------------------------
-my $parser = new Parse::RecDescent (q {
-startrule : id ',' id(s /,/)  {
-  $return = [$item[1], $item{id}]
-}
-
-id : /\w+/ }) || die $@;
-my $text = 'xxx,yyyy,zzzz';
-print Dumper $parser->startrule(\$text);
--------------------------------------------------------

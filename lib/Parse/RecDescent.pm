@@ -1647,7 +1647,8 @@ sub code($$$$)
         OPLOOP: while (1)
         {
           $repcount = 0;
-          my  @item;
+          my @item;
+          my %item;
 ';
 
     $code .= '
@@ -1746,7 +1747,7 @@ sub code($$$$)
 
     $code .= '
           last;
-        }
+        } # end of OPLOOP
 ';
 
     $code .= '
