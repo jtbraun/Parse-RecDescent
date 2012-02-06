@@ -10,25 +10,6 @@ parsed.  Basically a $was_expecting variable, set automatically.
 
 -----cut----------cut----------cut----------cut----------cut----------cut-----
 
-> How can I tell which version of Parse::RecDescent is installed? Usually
-> I do something like this:
->
->        perl -MParse::RecDescent -e 'print
-> "$Parse::RecDescent::VERSION\n";'
->
-> but that doesn't work with this module.
-
-Christopher
-
-No, it doesn't. I'll look at allowing it to work in future releases.
-For now, use:
-
-    perldoc -mT Parse::RecDescent | grep VERSION
-
-Damian
-
------cut----------cut----------cut----------cut----------cut----------cut-----
-
 Clean up parser object's unique namespace (i.e. delete all methods) when
 object is destroyed
 

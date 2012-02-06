@@ -20,7 +20,8 @@ sub import  # IMPLEMENT PRECOMPILER BEHAVIOUR UNDER:
     local *_die = sub { print @_, "\n"; exit };
 
     my ($package, $file, $line) = caller;
-    if (substr($file,0,1) eq '-' && $line == 0)
+
+    if ($file eq '-' && $line == 0)
     {
         _die("Usage: perl -MLocalTest - <grammarfile> <classname>")
             unless @ARGV == 2;
@@ -29,9 +30,10 @@ sub import  # IMPLEMENT PRECOMPILER BEHAVIOUR UNDER:
 
         local *IN;
         open IN, $sourcefile
-            or _die("Can't open grammar file '$sourcefile'");
-
-        my $grammar = join '', <IN>;
+            or _die(qq{Can't open grammar file "$sourcefile"});
+        local $/; #
+        my $grammar = <IN>;
+        close IN;
 
         Parse::RecDescent->Precompile($grammar, $class, $sourcefile);
         exit;

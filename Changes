@@ -695,3 +695,8 @@ NEXT_VERSION  NEXT_RELEASE
     - Allow a global <skip:> directive that functions the same as
       modifying $Parse::RecDescent::skip prior to compiling a
       grammar. (Thanks Flavio!)
+
+    - Require that the $file returned by caller() be eq '-', rather than merely
+      starting with '-'.  This allows execution of the following.  (Thanks Christopher)
+        perl -MParse::RecDescent -e 'print "$Parse::RecDescent::VERSION\n";'
+
