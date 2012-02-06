@@ -545,6 +545,12 @@ sub hasleftmost ($$)
     return 0;
 }
 
+sub isempty($)
+{
+    my $self = shift;
+    return 0 == @{$self->{"items"}};
+}
+
 sub leftmostsubrule($)
 {
     my $self = shift;
@@ -2921,6 +2927,23 @@ sub _check_grammar ($)
                    For example: \"$rule->{name}(s)\".");
             next;
         }
+
+    # CHECK FOR PRODUCTIONS FOLLOWING EMPTY PRODUCTIONS
+      {
+          my $hasempty;
+          my $prod;
+          foreach $prod ( @{$rule->{"prods"}} ) {
+              if ($hasempty) {
+                  _error("Production " . $prod->describe . " for \"$rule->{name}\"
+                         will never be reached (preceding empty production will
+                         always match first).");
+                  _hint("Reorder the grammar so that the empty production
+                         is last in the list or productions.");
+                  last;
+              }
+              $hasempty ||= $prod->isempty();
+          }
+      }
     }
 }
 

@@ -99,12 +99,6 @@ Update meta-grammar to capture current features
 
 ================================================================================
 
-Warn on empty productions followed by other productions:
-"Production %s will never be reached (preceding empty production will
-always match first)"
-
-================================================================================
-
 * in "was expecting" error message, add alternatives for zero or more
   options. For example:
 

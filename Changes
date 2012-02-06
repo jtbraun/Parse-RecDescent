@@ -700,3 +700,6 @@ NEXT_VERSION  NEXT_RELEASE
       starting with '-'.  This allows execution of the following.  (Thanks Christopher)
         perl -MParse::RecDescent -e 'print "$Parse::RecDescent::VERSION\n";'
 
+    - Warn on empty productions followed by other productions.  The
+      empty production always matches, so following productions will
+      never be reached.
