@@ -1,8 +1,9 @@
 use strict;
 use warnings;
 use Parse::RecDescent;
-use Test::More tests => 7;
+use Test::More tests => 14;
 
+# mask "subroutine element redefined" warnings
 local $^W;
 
 my $grammar = <<'EOGRAMMAR';
@@ -14,28 +15,32 @@ element: 'punctuation' {
 | /\w+/
 EOGRAMMAR
 
-my $class = 'TestParser';
-my $pm_filename = $class . '.pm';
 
-if (-e $pm_filename) {
+for my $standalone (0..1) {
+    my $standalone_str = $standalone ? 'standalone' : 'dependent';
+    my $class = "TestParser$standalone_str";
+    my $pm_filename = $class . '.pm';
+
+    if (-e $pm_filename) {
+        unlink $pm_filename;
+    }
+    ok(!-e $pm_filename, "no preexisting precompiled parser");
+
+    eval {
+        Parse::RecDescent->Precompile({-standalone => $standalone,},
+                                      $grammar,
+                                      $class);
+    };
+    ok(!$@, qq{created a $standalone_str precompiled parser: } . $@);
+    ok(-f $pm_filename, "found $standalone_str precompiled parser");
+
+    eval "use $class;";
+    ok(!$@, qq{use'd a $standalone_str precompiled parser: }.$@);
+
     unlink $pm_filename;
-}
-ok(!-e $pm_filename, "no preexisting precompiled parser");
+    ok(!-e $pm_filename, "deleted $standalone_str precompiled parser");
 
-eval {
-    Parse::RecDescent->Precompile($grammar,
-                                  $class);
-};
-ok(!$@, 'created a precompiled parser: '. $@);
-ok(-f $pm_filename, "found precompiled parser");
-
-eval "use $class;";
-ok(!$@, q{use'd a precompiled parser: }.$@);
-
-unlink $pm_filename;
-ok(!-e $pm_filename, "deleted precompiled parser");
-
-my $result = eval qq{
+    my $result = eval qq{
     my \$text = "one, two, three, four,
 punctuation, !, five, six, seven ;";
 
@@ -43,9 +48,10 @@ punctuation, !, five, six, seven ;";
     my \$parser = $class->new();
     \$parser->TOP(\$text);
 };
-ok(!$@, 'ran a precompiled parser');
-is_deeply($result,
-          [qw(one two three four punctuation
-              ! five six seven)],
-          "correct result from precompiled parser");
+    ok(!$@, qq{ran a $standalone_str precompiled parser});
+    is_deeply($result,
+              [qw(one two three four punctuation
+                  ! five six seven)],
+              "correct result from precompiled parser");
+}
 

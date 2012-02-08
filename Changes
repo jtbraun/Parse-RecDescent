@@ -721,16 +721,20 @@ NEXT_VERSION  NEXT_RELEASE
       'yyy' and 'zzz' set $item{id}, but in the private %item, which
       goes out of scope once the repetition match completes.
 
-    - When precompiling, create a standalone parser by including most
-      of the contents of Parse::RecDescent in the resulting Precompiled
-      output.
+    - ** EXPERIMENTAL ** When precompiling, optionally create a
+      standalone parser by including most of the contents of
+      Parse::RecDescent in the resulting Precompiled output.
 
-      - Lay the groundwork for creating both standalone and dependent
-        parsers in the future by conditioning the new behavior on
-        $opt->{-standalone}, which is always true, currently.
+      - Accept an optional $options hashref to Precompile, which can
+        be used to specify $options->{-standalone}, which currently
+        defaults to false.
 
       - The subroutines import, Precompile and Save are not included
         in the Precompile'd parser.
+
+      - The included Parse::RecDescent module is renamed to
+        Parse::RecDescent::_Runtime to avoid namespace conflicts with
+        an installed and use'd Parse::RecDescent.
 
       - Add a new t/precompile.t to test precompilation.
 
@@ -743,3 +747,4 @@ NEXT_VERSION  NEXT_RELEASE
         calls to _generate in Replace and Extend normally do not see
         the prototype, but do when re-defined.
 
+      - POD documentation for standalone parsers added.

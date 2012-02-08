@@ -43,7 +43,13 @@ sub import  # IMPLEMENT PRECOMPILER BEHAVIOUR UNDER:
 
 sub Save
 {
-    my ($self, $class) = @_;
+    my $self = shift;
+    my %opt;
+    if ('HASH' eq ref $_[0]) {
+        %opt = (%opt, %{$_[0]});
+        shift;
+    }
+    my ($class) = @_;
     $self->{saving} = 1;
     $self->Precompile(undef,$class);
     $self->{saving} = 0;
@@ -51,14 +57,22 @@ sub Save
 
 sub Precompile
 {
-    my ($self, $grammar, $class, $sourcefile) = @_;
-    my $opt = {-standalone => 1}; # TODO: for future named option expansion
+    my $self = shift;
+    my %opt = ( -standalone => 0 );
+    if ('HASH' eq ref $_[0]) {
+        %opt = (%opt, %{$_[0]});
+        shift;
+    }
+    my ($grammar, $class, $sourcefile) = @_;
 
     $class =~ /^(\w+::)*\w+$/ or croak("Bad class name: $class");
 
     my $modulefile = $class;
     $modulefile =~ s/.*:://;
     $modulefile .= ".pm";
+
+    my $runtime_package = 'Parse::RecDescent::_Runtime';
+    my $code;
 
     local *OUT;
     open OUT, ">", $modulefile
@@ -72,10 +86,10 @@ sub Precompile
     # including the contents of Parse::RecDescent as
     # Parse::RecDescent::Runtime in the resulting precompiled
     # parser.
-    if ($opt->{-standalone}) {
+    if ($opt{-standalone}) {
         local *IN;
         open IN, '<', $Parse::RecDescent::_FILENAME
-          or croak("Can't open Parse::RecDescent for standalone pre-compilation: $!\n");
+          or croak("Can't open $Parse::RecDescent::_FILENAME for standalone pre-compilation: $!\n");
         my $exclude = 0;
         print OUT "{\n";
         while (<IN>) {
@@ -90,6 +104,7 @@ sub Precompile
                 if ($_ =~ m/^__END__/) {
                     last;
                 }
+                s/Parse::RecDescent/$runtime_package/gs;
                 print OUT $_;
             }
         }
@@ -112,19 +127,27 @@ sub Precompile
 
 
     print OUT "package $class;\n";
-    if (not $opt->{-standalone}) {
+    if (not $opt{-standalone}) {
         print OUT "use Parse::RecDescent;\n";
     }
 
     print OUT "{ my \$ERRORS;\n\n";
 
-    print OUT $self->_code();
+    $code = $self->_code();
+    if ($opt{-standalone}) {
+        $code =~ s/Parse::RecDescent/$runtime_package/gs;
+    }
+    print OUT $code;
 
     print OUT "}\npackage $class; sub new { ";
     print OUT "my ";
 
     require Data::Dumper;
-    print OUT Data::Dumper->Dump([$self], [qw(self)]);
+    $code = Data::Dumper->Dump([$self], [qw(self)]);
+    if ($opt{-standalone}) {
+        $code =~ s/Parse::RecDescent/$runtime_package/gs;
+    }
+    print OUT $code;
 
     print OUT "}";
 
@@ -5913,15 +5936,21 @@ you could use:
 
     use Parse::RecDescent;
 
-    Parse::RecDescent->Precompile($grammar, "PreGrammar");
+    Parse::RecDescent->Precompile([$options_hashref], $grammar, "PreGrammar");
 
-The first argument is the grammar string, the second is the name of the class
-to be built. The name of the module file is generated automatically by
-appending ".pm" to the last element of the class name. Thus
+The first required argument is the grammar string, the second is the
+name of the class to be built. The name of the module file is
+generated automatically by appending ".pm" to the last element of the
+class name. Thus
 
     Parse::RecDescent->Precompile($grammar, "My::New::Parser");
 
 would produce a module file named Parser.pm.
+
+An optional hash reference may be supplied as the first argument to
+C<Precompile>.  This argument is currently EXPERIMENTAL, and may change
+in a future release of Parse::RecDescent.  The only supported option
+is currently C<-standalone>, see L</"Standalone Precompiled Parsers">.
 
 It is somewhat tedious to have to write a small Perl program just to
 generate a precompiled grammar class, so Parse::RecDescent has some special
@@ -5961,6 +5990,29 @@ the same, so whilst precompilation has an effect on I<set-up> speed,
 it has no effect on I<parsing> speed. RecDescent 2.0 will address that
 problem.
 
+=head3 Standalone Precompiled Parsers
+
+Until version 1.967003 of Parse::RecDescent, parser modules built with
+C<Precompile> were dependent on Parse::RecDescent.  Future
+Parse::RecDescent releases with different internal implementations
+would break pre-existing precompiled parsers.
+
+Version 1.967_004 added the ability for Parse::RecDescent to include
+itself in the resulting .pm file if you pass the boolean option
+C<-standalone> to C<Precompile>:
+
+    Parse::RecDescent->Precompile({ -standalone = 1, },
+        $grammar, "My::New::Parser");
+
+Parse::RecDescent is included as Parse::RecDescent::_Runtime in order
+to avoid conflicts between an installed version of Parse::RecDescent
+and a precompiled, standalone parser made with another version of
+Parse::RecDescent.  This renaming is experimental, and is subject to
+change in future versions.
+
+Precompiled parsers remain dependent on Parse::RecDescent by default,
+as this feature is still considered experimental.  In the future,
+standalone parsers will become the default.
 
 =head1 GOTCHAS
 
