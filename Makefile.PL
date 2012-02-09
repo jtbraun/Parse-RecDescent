@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.62;
 
 WriteMakefile(
     NAME             => 'Parse::RecDescent',
@@ -11,6 +11,12 @@ WriteMakefile(
     VERSION_FROM     => 'lib/Parse/RecDescent.pm',
     ABSTRACT_FROM    => 'lib/Parse/RecDescent.pm',
     PL_FILES         => {},
+    BUILD_REQUIRES   => {
+        'ExtUtils::MakeMaker' => 6.62,
+    },
+    CONFIGURE_REQUIRES   => {
+        'ExtUtils::MakeMaker' => 6.62,
+    },
     PREREQ_PM        => {
         'Text::Balanced' => 0,
         'Test::More'     => 0,

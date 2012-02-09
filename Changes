@@ -748,3 +748,10 @@ Revision history for Parse-RecDescent
         the prototype, but do when re-defined.
 
       - POD documentation for standalone parsers added.
+
+1.967_005   Wed Feb  8 18:46:35 2012
+
+      - Added JTBRAUN@CPAN.org as author in Build.PL.
+
+      - Added ExtUtils::MakeMaker build/configure version
+        requirements. (RT.cpan.org #74787, Thanks POPEL!)

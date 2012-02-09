@@ -5,7 +5,10 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name         => 'Parse::RecDescent',
     license             => 'perl',
-    dist_author         => 'Damian Conway <DCONWAY@CPAN.org>',
+    dist_author         => [
+        'Damian Conway <DCONWAY@CPAN.org>',
+        'Jeremy T. Braun <JTBRAUN@CPAN.org>',
+    ],
     dist_version_from   => 'lib/Parse/RecDescent.pm',
     requires => {
         'Text::Balanced' => 0,

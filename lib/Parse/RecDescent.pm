@@ -1895,7 +1895,7 @@ use vars qw ( $AUTOLOAD $VERSION $_FILENAME);
 
 my $ERRORS = 0;
 
-our $VERSION = '1.967_004';
+our $VERSION = '1.967_005';
 $VERSION = eval $VERSION;
 $_FILENAME=__FILE__;
 
@@ -3377,7 +3377,7 @@ Parse::RecDescent - Generate Recursive-Descent Parsers
 
 =head1 VERSION
 
-This document describes version 1.967_004 of Parse::RecDescent
+This document describes version 1.967_005 of Parse::RecDescent
 released January 29th, 2012.
 
 =head1 SYNOPSIS
@@ -5997,7 +5997,7 @@ C<Precompile> were dependent on Parse::RecDescent.  Future
 Parse::RecDescent releases with different internal implementations
 would break pre-existing precompiled parsers.
 
-Version 1.967_004 added the ability for Parse::RecDescent to include
+Version 1.967_005 added the ability for Parse::RecDescent to include
 itself in the resulting .pm file if you pass the boolean option
 C<-standalone> to C<Precompile>:
 
