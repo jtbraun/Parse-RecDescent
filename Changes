@@ -619,8 +619,10 @@ Revision history for Parse-RecDescent
     - Applied fix to restore skipped prefixes on match failure
       (thanks Jeremy!)
 
-    - Removed formats to eliminate problems with filehandle duplication
-      in forked environments
+    - *** NON-BACKWARDS COMPATIBLE CHANGE! *** Removed formats to
+      eliminate problems with filehandle duplication in forked
+      environments.  Removed redirect_reporting_to() in favor of using
+      STDERR for all error/trace output.
 
 1.966_002  Sun Jan 22 19:08:37 2012
 
