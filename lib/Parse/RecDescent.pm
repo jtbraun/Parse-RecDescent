@@ -3015,7 +3015,7 @@ sub _code($)
     my $self = shift;
     my $initial_skip = defined($self->{skip}) ? $self->{skip} : $skip;
 
-    my $code = qq{
+    my $code = qq!
 package $self->{namespace};
 use strict;
 use vars qw(\$skip \$AUTOLOAD $self->{localvars} );
@@ -3029,12 +3029,19 @@ local \$SIG{__WARN__} = sub {0};
 *$self->{namespace}::AUTOLOAD   = sub
 {
     no strict 'refs';
-    \$AUTOLOAD =~ s/^$self->{namespace}/Parse::RecDescent/;
-    goto &{\$AUTOLOAD};
+!
+# This generated code uses ${"AUTOLOAD"} rather than $AUTOLOAD in
+# order to avoid the circular reference documented here:
+#    https://rt.perl.org/rt3/Public/Bug/Display.html?id=110248
+# As a result of the investigation of
+#    https://rt.cpan.org/Ticket/Display.html?id=53710
+. qq!
+    \${"AUTOLOAD"} =~ s/^$self->{namespace}/Parse::RecDescent/;
+    goto &{\${"AUTOLOAD"}};
 }
 }
 
-};
+!;
     $code .= "push \@$self->{namespace}\::ISA, 'Parse::RecDescent';";
     $self->{"startcode"} = '';
 

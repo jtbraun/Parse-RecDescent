@@ -773,3 +773,7 @@ NEXT_VERSION   NEXT_RELEASE
 
       - Removed unused version.pm prereq.
 
+      - Fix a circular reference memory leak caused by the use of
+        $AUTOLOAD in sub AUTOLOAD{} in the generated parser's
+        namespace.  Workaround documented in perl5 RT #110248.
+        (RT #53710, thanks Andreas!)
