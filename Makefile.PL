@@ -12,10 +12,10 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Parse/RecDescent.pm',
     PL_FILES         => {},
     BUILD_REQUIRES   => {
-        'ExtUtils::MakeMaker' => 6.62,
+        'ExtUtils::MakeMaker' => 6.5702,
     },
     CONFIGURE_REQUIRES   => {
-        'ExtUtils::MakeMaker' => 6.62,
+        'ExtUtils::MakeMaker' => 6.5702,
     },
     PREREQ_PM        => {
         'Text::Balanced' => 0,
