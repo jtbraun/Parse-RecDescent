@@ -767,3 +767,9 @@ NEXT_VERSION   NEXT_RELEASE
       - Revised ExtUtils::MakeMaker build/configure version
         requirements. (RT.cpan.org #74787, Thanks Paul!)
 
+      - Revised Text::Balanced prereq to require version 1.95,
+        necessary for t/skip.t to pass.
+        (RT.cpan.org #74787, Thanks Paul!)
+
+      - Removed unused version.pm prereq.
+

@@ -11,9 +11,8 @@ my $builder = Module::Build->new(
     ],
     dist_version_from   => 'lib/Parse/RecDescent.pm',
     requires => {
-        'Text::Balanced' => 0,
+        'Text::Balanced' => 1.95,
         'Test::More'     => 0,
-        'version'        => 0,
     },
     add_to_cleanup      => [ 'Parse-RecDescent-*' ],
 );
