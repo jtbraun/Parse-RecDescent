@@ -1961,6 +1961,23 @@ sub DESTROY {
         @{$self->{namespace} . '::ISA'} = ();
         # END WORKAROUND
 
+        # Some grammars may contain circular references between rules,
+        # such as:
+        #   a: 'ID' | b
+        #   b: '(' a ')'
+        # Unless these references are broken, the subs stay around on
+        # stash deletion below.  Iterate through the stash entries and
+        # for each defined code reference, set it to reference sub {}
+        # instead.
+        {
+            local $^W; # avoid 'sub redefined' warnings.
+            my $blank_sub = sub {};
+            while (my ($name, $glob) = each %{"Parse::RecDescent::$namespace\::"}) {
+                *$glob = $blank_sub if defined &$glob;
+            }
+        }
+
+        # Delete the namespace's stash
         delete $Parse::RecDescent::{$namespace.'::'};
     }
 }

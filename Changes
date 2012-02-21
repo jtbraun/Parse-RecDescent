@@ -777,4 +777,8 @@ NEXT_VERSION   NEXT_RELEASE
         $AUTOLOAD in sub AUTOLOAD{} in the generated parser's
         namespace.  Workaround documented in perl5 RT #110248.
         Workaround a circular reference memory leak in ISA documented
-        by perl5 RT #92708.  (RT #53710, thanks Andreas!)
+        by perl5 RT #92708.  A parser's DESTROY() method redefines all
+        subs before deleting the stash, to avoid circular references
+        between subrules. (RT #53710, thanks Andreas!)
+
+
