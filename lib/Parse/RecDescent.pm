@@ -3094,8 +3094,7 @@ sub AUTOLOAD    # ($parser, $text; $linenum, @args)
     croak "Could not find method: $AUTOLOAD\n" unless ref $_[0];
     my $class = ref($_[0]) || $_[0];
     my $text = ref($_[1]) eq 'SCALAR' ? ${$_[1]} : "$_[1]";
-    $_[0]->{lastlinenum} = $_[2]||_linecount($_[1]);
-    $_[0]->{lastlinenum} = _linecount($_[1]);
+    $_[0]->{lastlinenum} = _linecount($text);
     $_[0]->{lastlinenum} += ($_[2]||0) if @_ > 2;
     $_[0]->{offsetlinenum} = $_[0]->{lastlinenum};
     $_[0]->{fulltext} = $text;

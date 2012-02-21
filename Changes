@@ -781,4 +781,8 @@ NEXT_VERSION   NEXT_RELEASE
         subs before deleting the stash, to avoid circular references
         between subrules. (RT #53710, thanks Andreas!)
 
+      - Parse::RecDescent::AUTOLOAD did not correctly handle
+        initializing the line counting mechanism when a reference to a
+        scalar was passed to the parser. (RT.cpan.org #27705, thanks
+        Justin!)
 
