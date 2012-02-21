@@ -1950,6 +1950,17 @@ sub DESTROY {
     my $namespace = $self->{namespace};
     $namespace =~ s/Parse::RecDescent:://;
     if (!$self->{_precompiled}) {
+        # BEGIN WORKAROUND
+        # Perl has a bug that creates a circular reference between
+        # @ISA and that variable's stash:
+        #   https://rt.perl.org/rt3/Ticket/Display.html?id=92708
+        # Emptying the array before deleting the stash seems to
+        # prevent the leak.  Once the ticket above has been resolved,
+        # these two lines can be removed.
+        no strict 'refs';
+        @{$self->{namespace} . '::ISA'} = ();
+        # END WORKAROUND
+
         delete $Parse::RecDescent::{$namespace.'::'};
     }
 }
