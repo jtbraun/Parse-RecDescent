@@ -762,7 +762,7 @@ Revision history for Parse-RecDescent
 
       - Bumped version to 1.967006 for non-development release.
 
-NEXT_VERSION   NEXT_RELEASE
+1.967_007      Thu Feb 23 07:26:03 2012
 
       - Revised ExtUtils::MakeMaker build/configure version
         requirements. (RT.cpan.org #74787, Thanks Paul!)
