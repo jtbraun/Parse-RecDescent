@@ -119,7 +119,8 @@ sub Precompile
       || croak("Can't compile bad grammar")
       if $grammar;
 
-    $self->{_precompiled} = 1;
+    # Do not allow &DESTROY to remove the precompiled namespace
+    delete $self->{_not_precompiled};
 
     foreach ( keys %{$self->{rules}} ) {
         $self->{rules}{$_}{changed} = 1;
@@ -423,7 +424,7 @@ eval 'undef &' . $namespace . '::' . $self->{"name"} unless $parser->{saving};
 
     my $code =
 '
-# ARGS ARE: ($parser, $text; $repeating, $_noactions, $_itempos, \@args)
+# ARGS ARE: ($parser, $text; $repeating, $_noactions, \@args, $_itempos)
 sub ' . $namespace . '::' . $self->{"name"} .  '
 {
 	my $thisparser = $_[0];
@@ -454,8 +455,8 @@ sub ' . $namespace . '::' . $self->{"name"} .  '
     my %item = ();
     my $repeating =  $_[2];
     my $_noactions = $_[3];
-    my $_itempos = $_[4];
-    my @arg =    defined $_[5] ? @{ &{$_[5]} } : ();
+    my @arg =    defined $_[4] ? @{ &{$_[4]} } : ();
+    my $_itempos = $_[5];
     my %arg =    ($#arg & 01) ? @arg : (@arg, undef);
     my $text;
     my $lastsep;
@@ -1489,9 +1490,9 @@ sub code($$$$)
         . $self->callsyntax($namespace.'::')
         . '($thisparser,$text,$repeating,'
         . ($self->{"lookahead"}?'1':'$_noactions')
-        . ($check->{"itempos"}?',$itempos[$#itempos]':',undef')
         . ($self->{argcode} ? ",sub { return $self->{argcode} }"
                    : ',sub { \\@arg }')
+        . ($check->{"itempos"}?',$itempos[$#itempos]':',undef')
         . ')))
         {
             '.($self->{"lookahead"} ? '$text = $_savetext;' : '').'
@@ -1605,10 +1606,10 @@ sub code($$$$)
         . $self->callsyntax($namespace.'::')
         . ', ' . $min . ', ' . $max . ', '
         . ($self->{"lookahead"}?'1':'$_noactions')
-        . ($check->{"itempos"}?',$itempos[$#itempos]':',undef')
         . ',$expectation,'
         . ($self->{argcode} ? "sub { return $self->{argcode} }"
                         : 'sub { \\@arg }')
+        . ($check->{"itempos"}?',$itempos[$#itempos]':',undef')
         . ')))
         {
             Parse::RecDescent::_trace(q{<<'.Parse::RecDescent::_matchtracemessage($self,1).' repeated subrule: ['
@@ -1895,7 +1896,7 @@ use vars qw ( $AUTOLOAD $VERSION $_FILENAME);
 
 my $ERRORS = 0;
 
-our $VERSION = '1.967_007';
+our $VERSION = '1.967_008';
 $VERSION = eval $VERSION;
 $_FILENAME=__FILE__;
 
@@ -1924,6 +1925,13 @@ sub new ($$$$)
         "localvars" => '',
         "_AUTOACTION" => undef,
         "_AUTOTREE"   => undef,
+
+        # Precompiled parsers used to set _precompiled, but that
+        # wasn't present in some versions of Parse::RecDescent used to
+        # build precompiled parsers.  Instead, set a new
+        # _not_precompiled flag, which is remove from future
+        # Precompiled parsers at build time.
+        "_not_precompiled" => 1,
     };
 
 
@@ -1949,7 +1957,7 @@ sub DESTROY {
     my ($self) = @_;
     my $namespace = $self->{namespace};
     $namespace =~ s/Parse::RecDescent:://;
-    if (!$self->{_precompiled}) {
+    if ($self->{_not_precompiled}) {
         # BEGIN WORKAROUND
         # Perl has a bug that creates a circular reference between
         # @ISA and that variable's stash:
@@ -3114,7 +3122,15 @@ sub AUTOLOAD    # ($parser, $text; $linenum, @args)
 
     croak "Unknown starting rule ($AUTOLOAD) called\n"
         unless defined &$AUTOLOAD;
-    my $retval = &{$AUTOLOAD}($_[0],$text,undef,undef,undef,$args);
+    my $retval = &{$AUTOLOAD}(
+        $_[0], # $parser
+        $text, # $text
+        undef, # $repeating
+        undef, # $_noactions
+        $args, # \@args
+        undef, # $_itempos
+    );
+
 
     if (defined $retval)
     {
@@ -3133,7 +3149,7 @@ sub AUTOLOAD    # ($parser, $text; $linenum, @args)
 
 sub _parserepeat($$$$$$$$$)    # RETURNS A REF TO AN ARRAY OF MATCHES
 {
-    my ($parser, $text, $prod, $min, $max, $_noactions, $_itempos, $expectation, $argcode) = @_;
+    my ($parser, $text, $prod, $min, $max, $_noactions, $expectation, $argcode, $_itempos) = @_;
     my @tokens = ();
 
     my $itemposfirst;
@@ -3144,7 +3160,7 @@ sub _parserepeat($$$$$$$$$)    # RETURNS A REF TO AN ARRAY OF MATCHES
         my $_savetext = $text;
         my $prevtextlen = length $text;
         my $_tok;
-        if (! defined ($_tok = &$prod($parser,$text,1,$_noactions,$_itempos,$argcode)))
+        if (! defined ($_tok = &$prod($parser,$text,1,$_noactions,$argcode,$_itempos)))
         {
             $text = $_savetext;
             last;
@@ -3411,8 +3427,8 @@ Parse::RecDescent - Generate Recursive-Descent Parsers
 
 =head1 VERSION
 
-This document describes version 1.967_007 of Parse::RecDescent
-released January 29th, 2012.
+This document describes version 1.967_008 of Parse::RecDescent
+released March 13th, 2012.
 
 =head1 SYNOPSIS
 
