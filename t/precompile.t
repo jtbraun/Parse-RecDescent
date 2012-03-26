@@ -3,6 +3,9 @@ use warnings;
 use Parse::RecDescent;
 use Test::More tests => 14;
 
+# Turn off the "build a -standalone parser" precompile warning
+our $RD_HINT = 0;
+
 # mask "subroutine element redefined" warnings
 local $^W;
 

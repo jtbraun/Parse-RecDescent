@@ -795,3 +795,18 @@ Revision history for Parse-RecDescent
 1.967009      Fri Mar 16 07:25:09 2012
 
       - Bumped version to 1.967009 for non-development release.
+
+NEXT_VERSION   NEXT_RELEASE
+
+      - Base the standalone precompiled parser's runtime name on the
+        parser's class, rather than use the fixed
+        "Parse::RecDescent::_Runtime".  This prevents "already
+        defined" warnings when two standalone precompiled parsers are
+        used.
+
+      - Add support for allowing precompiled parsers to share a common
+        runtime via the Precompile({-runtime_class}) option and the
+        PrecompiledRuntime() function.
+
+      - Warn on creation of Precompiled parsers that depend on
+        Parse::RecDescent.
