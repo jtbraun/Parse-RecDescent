@@ -3096,14 +3096,17 @@ sub _check_grammar ($)
 sub _code($)
 {
     my $self = shift;
-    my $initial_skip = defined($self->{skip}) ? $self->{skip} : $skip;
+    require Data::Dumper;
+    my $initial_skip = defined($self->{skip}) ?
+      '$skip = ' . $self->{skip} . ';' :
+      Data::Dumper->Dump([$skip],[qw(skip)]);
 
     my $code = qq!
 package $self->{namespace};
 use strict;
 use vars qw(\$skip \$AUTOLOAD $self->{localvars} );
 \@$self->{namespace}\::ISA = ();
-\$skip = '$initial_skip';
+$initial_skip
 $self->{startcode}
 
 {
