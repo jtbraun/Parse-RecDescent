@@ -24,7 +24,7 @@ END_OF_TEXT
 
 # Test setting the initial skip via the <skip:> global directive
 RunTests(q{
-<skip:(?mxs: \s+ |\# .*?$)*>
+<skip:'(?mxs: \s+ |\# .*?$)*'>
 });
 
 # Test setting the initial skip via $Parse::RecDescent::skip global

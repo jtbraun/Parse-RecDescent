@@ -753,60 +753,62 @@ Revision history for Parse-RecDescent
 
 1.967_005   Wed Feb  8 18:46:35 2012
 
-      - Added JTBRAUN@CPAN.org as author in Build.PL.
+    - Added JTBRAUN@CPAN.org as author in Build.PL.
 
-      - Added ExtUtils::MakeMaker build/configure version
-        requirements. (RT.cpan.org #74787, Thanks POPEL!)
+    - Added ExtUtils::MakeMaker build/configure version
+      requirements. (RT.cpan.org #74787, Thanks POPEL!)
 
 1.967006   Fri Feb 10 20:48:48 2012
 
-      - Bumped version to 1.967006 for non-development release.
+    - Bumped version to 1.967006 for non-development release.
 
 1.967_007      Thu Feb 23 07:26:03 2012
 
-      - Revised ExtUtils::MakeMaker build/configure version
-        requirements. (RT.cpan.org #74787, Thanks Paul!)
+    - Revised ExtUtils::MakeMaker build/configure version
+      requirements. (RT.cpan.org #74787, Thanks Paul!)
 
-      - Revised Text::Balanced prereq to require version 1.95,
-        necessary for t/skip.t to pass.
-        (RT.cpan.org #74787, Thanks Paul!)
+    - Revised Text::Balanced prereq to require version 1.95, necessary
+      for t/skip.t to pass.  (RT.cpan.org #74787, Thanks Paul!)
 
-      - Removed unused version.pm prereq.
+    - Removed unused version.pm prereq.
 
-      - Fix a circular reference memory leak caused by the use of
-        $AUTOLOAD in sub AUTOLOAD{} in the generated parser's
-        namespace.  Workaround documented in perl5 RT #110248.
-        Workaround a circular reference memory leak in ISA documented
-        by perl5 RT #92708.  A parser's DESTROY() method redefines all
-        subs before deleting the stash, to avoid circular references
-        between subrules. (RT #53710, thanks Andreas!)
+    - Fix a circular reference memory leak caused by the use of
+      $AUTOLOAD in sub AUTOLOAD{} in the generated parser's namespace.
+      Workaround documented in perl5 RT #110248.  Workaround a
+      circular reference memory leak in ISA documented by perl5 RT
+      #92708.  A parser's DESTROY() method redefines all subs before
+      deleting the stash, to avoid circular references between
+      subrules. (RT #53710, thanks Andreas!)
 
-      - Parse::RecDescent::AUTOLOAD did not correctly handle
-        initializing the line counting mechanism when a reference to a
-        scalar was passed to the parser. (RT.cpan.org #27705, thanks
-        Justin!)
+    - Parse::RecDescent::AUTOLOAD did not correctly handle
+      initializing the line counting mechanism when a reference to a
+      scalar was passed to the parser. (RT.cpan.org #27705, thanks
+      Justin!)
 
 1.967_008      Tue Mar 13 22:28:00 2012
 
-      - Restore old _parserepeat calling convention.  Change a
-        parser's DESTROY method to check for $self->{_not_precompiled}
-        instead of $self->{_precompiled}. (Fix for RT #74593).
+    - Restore old _parserepeat calling convention.  Change a parser's
+      DESTROY method to check for $self->{_not_precompiled} instead of
+      $self->{_precompiled}. (Fix for RT #74593).
 
 1.967009      Fri Mar 16 07:25:09 2012
 
-      - Bumped version to 1.967009 for non-development release.
+    - Bumped version to 1.967009 for non-development release.
 
-NEXT_VERSION   NEXT_RELEASE
+1.967_010     Sun Jul  7 11:23:53 2013
 
-      - Base the standalone precompiled parser's runtime name on the
-        parser's class, rather than use the fixed
-        "Parse::RecDescent::_Runtime".  This prevents "already
-        defined" warnings when two standalone precompiled parsers are
-        used.
+    - Base the standalone precompiled parser's runtime name on the
+      parser's class, rather than use the fixed
+      "Parse::RecDescent::_Runtime".  This prevents "already defined"
+      warnings when two standalone precompiled parsers are used.
 
-      - Add support for allowing precompiled parsers to share a common
-        runtime via the Precompile({-runtime_class}) option and the
-        PrecompiledRuntime() function.
+    - Add support for allowing precompiled parsers to share a common
+      runtime via the Precompile({-runtime_class}) option and the
+      PrecompiledRuntime() function.
 
-      - Warn on creation of Precompiled parsers that depend on
-        Parse::RecDescent.
+    - Warn on creation of Precompiled parsers that depend on
+      Parse::RecDescent.
+
+    - *** NON-BACKWARDS COMPATIBLE CHANGE! *** Change global the
+      <skip:> directive to eval similar to other <skip:> directives,
+      rather than being single-quoted in the resulting parser.

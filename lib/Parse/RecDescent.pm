@@ -1943,7 +1943,7 @@ use vars qw ( $AUTOLOAD $VERSION $_FILENAME);
 
 my $ERRORS = 0;
 
-our $VERSION = '1.967009';
+our $VERSION = '1.967_010';
 $VERSION = eval $VERSION;
 $_FILENAME=__FILE__;
 
@@ -3477,7 +3477,7 @@ Parse::RecDescent - Generate Recursive-Descent Parsers
 
 =head1 VERSION
 
-This document describes version 1.967009 of Parse::RecDescent
+This document describes version 1.967_010 of Parse::RecDescent
 released March 16th, 2012.
 
 =head1 SYNOPSIS
@@ -4710,19 +4710,20 @@ a production to be changed. For example:
 
     OneLiner: Command <skip:'[ \t]*'> Arg(s) /;/
 
-causes only blanks and tabs to be skipped before terminals in the C<Arg>
-subrule (and any of I<its> subrules>, and also before the final C</;/> terminal.
-Once the production is complete, the previous terminal prefix is
-reinstated. Note that this implies that distinct productions of a rule
-must reset their terminal prefixes individually.
+causes only blanks and tabs to be skipped before terminals in the
+C<Arg> subrule (and any of I<its> subrules>, and also before the final
+C</;/> terminal.  Once the production is complete, the previous
+terminal prefix is reinstated. Note that this implies that distinct
+productions of a rule must reset their terminal prefixes individually.
 
-The C<E<lt>skipE<gt>> directive evaluates to the I<previous> terminal prefix,
-so it's easy to reinstate a prefix later in a production:
+The C<E<lt>skipE<gt>> directive evaluates to the I<previous> terminal
+prefix, so it's easy to reinstate a prefix later in a production:
 
     Command: <skip:","> CSV(s) <skip:$item[1]> Modifier
 
-The value specified after the colon is interpolated into a pattern, so all of
-the following are equivalent (though their efficiency increases down the list):
+The value specified after the colon is interpolated into a pattern, so
+all of the following are equivalent (though their efficiency increases
+down the list):
 
     <skip: "$colon|$comma">   # ASSUMING THE VARS HOLD THE OBVIOUS VALUES
 
@@ -4766,10 +4767,15 @@ Then you can set C<$::skip_pattern> before invoking
 C<Rule_with_dynamic_skip> and have it skip whatever you specified.
 
 B<Note: Up to release 1.51 of Parse::RecDescent, an entirely different
-mechanism was used for specifying terminal prefixes. The current method
-is not backwards-compatible with that early approach. The current approach
-is stable and will not to change again.>
+mechanism was used for specifying terminal prefixes. The current
+method is not backwards-compatible with that early approach. The
+current approach is stable and will not change again.>
 
+B<Note: the global C<E<lt>skipE<gt>> directive added in 1.967_004 did
+not interpolate the pattern argument, instead the pattern was placed
+inside of single quotes and then interpolated. This behavior was
+changed in 1.967_010 so that all C<E<lt>skipE<gt>> directives behavior
+similarly.>
 
 =item Resynchronization
 
