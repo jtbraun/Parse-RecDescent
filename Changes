@@ -812,3 +812,8 @@ Revision history for Parse-RecDescent
     - *** NON-BACKWARDS COMPATIBLE CHANGE! *** Change global the
       <skip:> directive to eval similar to other <skip:> directives,
       rather than being single-quoted in the resulting parser.
+
+NEXT_VERSION   NEXT_RELEASE DATE
+
+    - Correct some typos in the documentation. (RT.cpan.org #87185,
+      thanks dsteinbrunner!)

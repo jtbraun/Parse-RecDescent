@@ -3931,7 +3931,7 @@ access to the same item values:
 The results of named subrules are stored in the hash under each
 subrule's name (including the repetition specifier, if any),
 whilst all other items are stored under a "named
-positional" key that indictates their ordinal position within their item
+positional" key that indicates their ordinal position within their item
 type: __STRINGI<n>__, __PATTERNI<n>__, __DIRECTIVEI<n>__, __ACTIONI<n>__:
 
     stuff: /various/ bits 'and' pieces "then" data 'end' { save }
@@ -4457,7 +4457,7 @@ package in the example above.
 Normally, if a subrule appears in some production, but no rule of that
 name is ever defined in the grammar, the production which refers to the
 non-existent subrule fails immediately. This typically occurs as a
-result of misspellings, and is a sufficiently common occurance that a
+result of misspellings, and is a sufficiently common occurrence that a
 warning is generated for such situations.
 
 However, when prototyping a grammar it is sometimes useful to be
@@ -4543,7 +4543,7 @@ negative senses. Hence:
 
     inner_word: word ...!......!word
 
-is exactly equivalent the the original example above (a warning is issued in
+is exactly equivalent to the original example above (a warning is issued in
 cases like these, since they often indicate something left out, or
 misunderstood).
 
@@ -5009,7 +5009,7 @@ There is also a grammar directive to turn on warnings from within the
 grammar: C<< <warn> >>. It takes an optional argument, which specifies
 the warning level: C<< <warn: 2> >>.
 
-See F<"DIAGNOSTICS"> for a list of the varous error and warning messages
+See F<"DIAGNOSTICS"> for a list of the various error and warning messages
 that Parse::RecDescent generates when these two variables are defined.
 
 Defining any of the remaining variables (which are not defined by
@@ -5329,7 +5329,7 @@ a production which ultimately contributes to the successful parse.
 In this case, even though the first production of C<sentence> caused
 the subrules C<noun> and C<trans> to match, that production ultimately
 failed and so the deferred actions queued by those subrules were subsequently
-disgarded. The second production then succeeded, causing the entire
+discarded. The second production then succeeded, causing the entire
 parse to succeed, and so the deferred actions queued by the (second) match of
 the C<noun> subrule and the subsequent match of C<intrans> I<are> preserved and
 eventually executed.
@@ -5674,7 +5674,7 @@ is the most likely interpretation. However, if the sentence had been
 "fruit flies like a banana", then the second production is probably
 the right match.
 
-To cater for such situtations, the C<E<lt>score:...E<gt>> can be used.
+To cater for such situations, the C<E<lt>score:...E<gt>> can be used.
 The directive is equivalent to an unconditional C<E<lt>rejectE<gt>>,
 except that it allows you to specify a "score" for the current
 production. If that score is numerically greater than the best
@@ -5977,7 +5977,7 @@ Hence after:
     $add = "name: 'Jimmy-Bob' | 'Bobby-Jim'\ndesc: colour /necks?/";
     parser->Replace($add);
 
-are are I<only> valid "name"s and the one possible description.
+there are I<only> valid "name"s and the one possible description.
 
 A more interesting use of the C<Extend> and C<Replace> methods is to call them
 inside the action of an executing parser. For example:
