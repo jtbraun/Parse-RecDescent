@@ -89,6 +89,11 @@ sub Precompile
     open OUT, ">", $modulefile
       or croak("Can't write to new module file '$modulefile'");
 
+    print OUT "#\n",
+      "# This parser was generated with\n",
+      "# Parse::RecDescent version $Parse::RecDescent::VERSION\n",
+      "#\n\n";
+
     print STDERR "precompiling grammar from file '$sourcefile'\n",
       "to class $class in module file '$modulefile'\n"
       if $grammar && $sourcefile;

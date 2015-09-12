@@ -822,3 +822,7 @@ NEXT_VERSION   NEXT_RELEASE DATE
       the output text for a given input text the same, reducing
       differences in automated builds. (RT.cpan.org #102160, thanks
       Reiner!)
+
+    - Precompiled parsers now document which
+      $Parse::RecDescent::VERSION was used to generate
+      them. (RT.cpan.org #77001)
