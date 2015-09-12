@@ -1950,7 +1950,7 @@ use vars qw ( $AUTOLOAD $VERSION $_FILENAME);
 
 my $ERRORS = 0;
 
-our $VERSION = '1.967_010';
+our $VERSION = '1.967011';
 $VERSION = eval $VERSION;
 $_FILENAME=__FILE__;
 
@@ -3486,8 +3486,8 @@ Parse::RecDescent - Generate Recursive-Descent Parsers
 
 =head1 VERSION
 
-This document describes version 1.967_010 of Parse::RecDescent
-released March 16th, 2012.
+This document describes version 1.967011 of Parse::RecDescent
+released September 12th, 2015.
 
 =head1 SYNOPSIS
 

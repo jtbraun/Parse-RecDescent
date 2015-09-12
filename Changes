@@ -813,7 +813,7 @@ Revision history for Parse-RecDescent
       <skip:> directive to eval similar to other <skip:> directives,
       rather than being single-quoted in the resulting parser.
 
-NEXT_VERSION   NEXT_RELEASE DATE
+1.967011      Sat Sep 12 16:42:01 2015
 
     - Correct some typos in the documentation. (RT.cpan.org #87185,
       thanks dsteinbrunner!)
