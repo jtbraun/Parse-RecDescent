@@ -191,6 +191,8 @@ EOWARNING
         print OUT "my ";
 
         require Data::Dumper;
+        # Sort the keys to ensure the output is reproducible
+        local $Data::Dumper::SortKeys = 1;
         $code = Data::Dumper->Dump([$self], [qw(self)]);
         $code =~ s/Parse::RecDescent/$opt{-runtime_class}/gs;
 
@@ -3132,7 +3134,9 @@ local \$SIG{__WARN__} = sub {0};
     $self->{"startcode"} = '';
 
     my $rule;
-    foreach $rule ( values %{$self->{"rules"}} )
+    # sort the rules to ensure the output is reproducible
+    foreach $rule ( sort { $a->{name} cmp $b->{name} }
+                    values %{$self->{"rules"}} )
     {
         if ($rule->{"changed"})
         {

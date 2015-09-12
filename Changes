@@ -817,3 +817,8 @@ NEXT_VERSION   NEXT_RELEASE DATE
 
     - Correct some typos in the documentation. (RT.cpan.org #87185,
       thanks dsteinbrunner!)
+
+    - Sort hash keys and rulenames when generating code. This keeps
+      the output text for a given input text the same, reducing
+      differences in automated builds. (RT.cpan.org #102160, thanks
+      Reiner!)

@@ -1,0 +1,21 @@
+diff --git a/lib/Parse/RecDescent.pm b/lib/Parse/RecDescent.pm
+index 28149d7..57acb18 100644
+--- a/lib/Parse/RecDescent.pm
++++ b/lib/Parse/RecDescent.pm
+@@ -144,6 +144,7 @@ sub Precompile
+     print OUT "my ";
+ 
+     require Data::Dumper;
++    $Data::Dumper::Sortkeys = 1;
+     $code = Data::Dumper->Dump([$self], [qw(self)]);
+     if ($opt{-standalone}) {
+         $code =~ s/Parse::RecDescent/$runtime_package/gs;
+@@ -3082,7 +3083,7 @@ local \$SIG{__WARN__} = sub {0};
+     $self->{"startcode"} = '';
+ 
+     my $rule;
+-    foreach $rule ( values %{$self->{"rules"}} )
++    foreach $rule ( sort { $a->{name} cmp $b->{name} } values %{$self->{"rules"}} )
+     {
+         if ($rule->{"changed"})
+         {
