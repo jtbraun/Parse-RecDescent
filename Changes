@@ -826,3 +826,9 @@ Revision history for Parse-RecDescent
     - Precompiled parsers now document which
       $Parse::RecDescent::VERSION was used to generate
       them. (RT.cpan.org #77001)
+
+1.967012      Sun Sep 13 07:59:00 2015
+
+    - Reference Data::Dumper::Sortkeys, not SortKeys. Actually
+      produces reproducible precompiled parsers now. (RT.cpan.org
+      #107061, thanks Slaven!)

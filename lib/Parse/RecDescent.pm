@@ -197,7 +197,7 @@ EOWARNING
 
         require Data::Dumper;
         # Sort the keys to ensure the output is reproducible
-        local $Data::Dumper::SortKeys = 1;
+        local $Data::Dumper::Sortkeys = 1;
         $code = Data::Dumper->Dump([$self], [qw(self)]);
         $code =~ s/Parse::RecDescent/$opt{-runtime_class}/gs;
 
@@ -1950,7 +1950,7 @@ use vars qw ( $AUTOLOAD $VERSION $_FILENAME);
 
 my $ERRORS = 0;
 
-our $VERSION = '1.967011';
+our $VERSION = '1.967012';
 $VERSION = eval $VERSION;
 $_FILENAME=__FILE__;
 
@@ -3486,8 +3486,8 @@ Parse::RecDescent - Generate Recursive-Descent Parsers
 
 =head1 VERSION
 
-This document describes version 1.967011 of Parse::RecDescent
-released September 12th, 2015.
+This document describes version 1.967012 of Parse::RecDescent
+released September 13th, 2015.
 
 =head1 SYNOPSIS
 
