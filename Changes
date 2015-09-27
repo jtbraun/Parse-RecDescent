@@ -832,3 +832,10 @@ Revision history for Parse-RecDescent
     - Reference Data::Dumper::Sortkeys, not SortKeys. Actually
       produces reproducible precompiled parsers now. (RT.cpan.org
       #107061, thanks Slaven!)
+
+1.967013      Sun Sep 27 10:00:36 2015
+
+    - Wrap Data::Dumper->Dump() to localize some $Data::Dumper::VARS
+      to control the dumped output. In particular,
+      Data::Dumper::Terse=1 was reported to break parser
+      generation. (RT.cpan.org #107355, thanks Sherrard!)

@@ -57,4 +57,3 @@ punctuation, !, five, six, seven ;";
                   ! five six seven)],
               "correct result from precompiled parser");
 }
-

@@ -6,7 +6,7 @@
 # Change 1..1 below to 1..last_test_to_print .
 # (It may become useful if the test is moved to ./t subdirectory.)
 
-BEGIN { $| = 1; print "1..28\n"; }
+BEGIN { $| = 1; print "1..32\n"; }
 END {print "not ok 1\n" unless $loaded;}
 use Parse::RecDescent;
 $loaded = 1;
@@ -271,3 +271,18 @@ ok ($parser) or exit;
 
 ok($parser->whatever(" \\ "));
 ok($parser->whatever(" whatever "));
+
+
+#################################################################
+# Check that changing some Data::Dumper variables don't break the
+# parsers
+foreach my $terse (0..1) {
+	local $Data::Dumper::Terse = $terse;
+	$parser = new Parse::RecDescent q{
+   startrule : string
+   string : "hello"
+};
+
+	ok ($parser) or exit;
+	ok($parser->startrule("hello"));
+}

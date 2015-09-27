@@ -195,10 +195,7 @@ EOWARNING
         print OUT "}\npackage $class; sub new { ";
         print OUT "my ";
 
-        require Data::Dumper;
-        # Sort the keys to ensure the output is reproducible
-        local $Data::Dumper::Sortkeys = 1;
-        $code = Data::Dumper->Dump([$self], [qw(self)]);
+        $code = $self->_dump([$self], [qw(self)]);
         $code =~ s/Parse::RecDescent/$opt{-runtime_class}/gs;
 
         print OUT $code;
@@ -1950,7 +1947,7 @@ use vars qw ( $AUTOLOAD $VERSION $_FILENAME);
 
 my $ERRORS = 0;
 
-our $VERSION = '1.967012';
+our $VERSION = '1.967013';
 $VERSION = eval $VERSION;
 $_FILENAME=__FILE__;
 
@@ -3103,10 +3100,9 @@ sub _check_grammar ($)
 sub _code($)
 {
     my $self = shift;
-    require Data::Dumper;
     my $initial_skip = defined($self->{skip}) ?
       '$skip = ' . $self->{skip} . ';' :
-      Data::Dumper->Dump([$skip],[qw(skip)]);
+      $self->_dump([$skip],[qw(skip)]);
 
     my $code = qq!
 package $self->{namespace};
@@ -3153,6 +3149,57 @@ local \$SIG{__WARN__} = sub {0};
     return $code;
 }
 
+# A wrapper for Data::Dumper->Dump, which localizes some variables to
+# keep the output in a form suitable for Parse::RecDescent.
+#
+# List of variables and their defaults taken from
+# $Data::Dumper::VERSION == 2.158
+
+sub _dump {
+	require Data::Dumper;
+
+	#
+	# Allow the user's settings to persist for some features in case
+	# RD_TRACE is set.  These shouldn't affect the eval()-ability of
+	# the resulting parser.
+	#
+
+	#local $Data::Dumper::Indent = 2;
+	#local $Data::Dumper::Useqq      = 0;
+	#local $Data::Dumper::Quotekeys  = 1;
+	#local $Data::Dumper::Useperl = 0;
+
+	#
+	# These may affect whether the output is valid perl code for
+	# eval(), and must be controlled. Set them to their default
+	# values.
+	#
+
+	local $Data::Dumper::Purity     = 0;
+	local $Data::Dumper::Pad        = "";
+	local $Data::Dumper::Varname    = "VAR";
+	local $Data::Dumper::Terse      = 0;
+	local $Data::Dumper::Freezer    = "";
+	local $Data::Dumper::Toaster    = "";
+	local $Data::Dumper::Deepcopy   = 0;
+	local $Data::Dumper::Bless      = "bless";
+	local $Data::Dumper::Maxdepth   = 0;
+	local $Data::Dumper::Pair       = ' => ';
+	local $Data::Dumper::Deparse    = 0;
+	local $Data::Dumper::Sparseseen = 0;
+
+	#
+	# Modify the below options from their defaults.
+	#
+
+	# Sort the keys to ensure the output is reproducible
+	local $Data::Dumper::Sortkeys   = 1;
+
+	# Don't stop recursing
+	local $Data::Dumper::Maxrecurse = 0;
+
+	return Data::Dumper->Dump(@_[1..$#_]);
+}
 
 # EXECUTING A PARSE....
 
@@ -3486,8 +3533,8 @@ Parse::RecDescent - Generate Recursive-Descent Parsers
 
 =head1 VERSION
 
-This document describes version 1.967012 of Parse::RecDescent
-released September 13th, 2015.
+This document describes version 1.967013 of Parse::RecDescent
+released September 27th, 2015.
 
 =head1 SYNOPSIS
 
