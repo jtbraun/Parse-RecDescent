@@ -848,3 +848,6 @@ VERSION_NEXT  DateNext
 
     - Provide repository and bugtracker entries in
       MYMETA.*. (RT.cpan.org #110403, thanks Martin!)
+
+    - Update tests to handle '.' no longer being part of @INC in
+      perl-5.26.0. (RT.cpan.org #120415, thanks Jim!)

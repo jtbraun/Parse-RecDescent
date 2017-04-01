@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Parse::RecDescent;
 use Test::More tests => 14;
+use lib '.';
 
 # Turn off the "build a -standalone parser" precompile warning
 our $RD_HINT = 0;

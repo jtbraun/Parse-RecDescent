@@ -26,7 +26,7 @@ my $grammar = q {
 my $parser = new Parse::RecDescent($grammar) or die "Bad Grammar";
 
 use Test::More tests=>8;
-require 't/util.pl';
+require './t/util.pl';
 
 my $text = "a + b - c + d";
 
