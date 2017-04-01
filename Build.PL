@@ -15,6 +15,10 @@ my $builder = Module::Build->new(
         'Test::More'     => 0,
     },
     add_to_cleanup      => [ 'Parse-RecDescent-*' ],
+    meta_merge          => {
+        "meta-spec" => { version => 2 },
+        do './MYMETA.pl'
+    }
 );
 
 $builder->create_build_script();

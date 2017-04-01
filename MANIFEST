@@ -2,6 +2,7 @@ Build.PL
 Changes
 MANIFEST
 Makefile.PL
+MYMETA.pl
 README
 ToDo
 demo/demo.c

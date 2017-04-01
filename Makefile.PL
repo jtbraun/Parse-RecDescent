@@ -10,6 +10,7 @@ WriteMakefile(
     ],
     VERSION_FROM     => 'lib/Parse/RecDescent.pm',
     ABSTRACT_FROM    => 'lib/Parse/RecDescent.pm',
+    LICENSE          => 'perl_5',
     PL_FILES         => {},
     BUILD_REQUIRES   => {
         'ExtUtils::MakeMaker' => 6.5702,
@@ -23,4 +24,9 @@ WriteMakefile(
     },
     dist             => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean            => { FILES => 'Parse-RecDescent-* RD_TRACE' },
+
+    META_MERGE       => {
+        "meta-spec" => { version => 2 },
+        do './MYMETA.pl'
+    }
 );

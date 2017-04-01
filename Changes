@@ -846,3 +846,5 @@ VERSION_NEXT  DateNext
       parsers, to keep CPAN from indexing them. (RT.cpan.org #110404,
       thanks Martin!)
 
+    - Provide repository and bugtracker entries in
+      MYMETA.*. (RT.cpan.org #110403, thanks Martin!)
