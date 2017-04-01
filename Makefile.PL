@@ -27,6 +27,6 @@ WriteMakefile(
 
     META_MERGE       => {
         "meta-spec" => { version => 2 },
-        do './MYMETA.pl'
+        require './MYMETA.pl'
     }
 );

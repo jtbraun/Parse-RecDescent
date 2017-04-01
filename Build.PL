@@ -17,7 +17,7 @@ my $builder = Module::Build->new(
     add_to_cleanup      => [ 'Parse-RecDescent-*' ],
     meta_merge          => {
         "meta-spec" => { version => 2 },
-        do './MYMETA.pl'
+        require './MYMETA.pl'
     }
 );
 
