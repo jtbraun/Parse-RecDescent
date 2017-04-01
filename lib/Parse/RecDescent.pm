@@ -171,6 +171,12 @@ EOWARNING
                     last;
                 }
 
+                # Standalone parsers shouldn't trigger the CPAN
+                # indexer to index the runtime, as it shouldn't be
+                # exposed as a user-consumable package.
+                #
+                # Trick the indexer by including a newline in the package declarations
+                s/^package /package # this should not be indexed by CPAN\n/gs;
                 s/Parse::RecDescent/$opt{-runtime_class}/gs;
                 print OUT $_;
             }

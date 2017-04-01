@@ -839,3 +839,10 @@ Revision history for Parse-RecDescent
       to control the dumped output. In particular,
       Data::Dumper::Terse=1 was reported to break parser
       generation. (RT.cpan.org #107355, thanks Sherrard!)
+
+VERSION_NEXT  DateNext
+
+    - Add a newline to package declaration lines in precompiled
+      parsers, to keep CPAN from indexing them. (RT.cpan.org #110404,
+      thanks Martin!)
+
