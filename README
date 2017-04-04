@@ -1,4 +1,4 @@
-Parse::RecDescent version 1.967014
+Parse::RecDescent version 1.967015
 
 NAME
 
@@ -16,7 +16,7 @@ DESCRIPTION
 
         * Repeated, optional and alternate subrules within productions,
 
-	* Late-bound (run-time dispatched) subrules
+        * Late-bound (run-time dispatched) subrules
 
         * Full access to Perl within actions specified as part of the grammar,
 
@@ -27,10 +27,10 @@ DESCRIPTION
 
         * Incremental extension of the parsing grammar (even during a parse),
 
-	* Precompilation of parser objects,
+        * Precompilation of parser objects,
 
-	* User-definable reduce-reduce conflict resolution via
-	  "scoring" of matching productions.
+        * User-definable reduce-reduce conflict resolution via
+          "scoring" of matching productions.
 
 
 LIMITATIONS

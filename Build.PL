@@ -17,8 +17,17 @@ my $builder = Module::Build->new(
     add_to_cleanup      => [ 'Parse-RecDescent-*' ],
     meta_merge          => {
         "meta-spec" => { version => 2 },
-        require './MYMETA.pl'
-    }
+        resources => {
+            repository => {
+                type => 'git',
+                url => 'git://github.com/jtbraun/Parse-RecDescent',
+                web => 'https://github.com/jtbraun/Parse-RecDescent',
+            },
+            bugtracker => {
+                web => 'https://rt.cpan.org/Dist/Display.html?Status=Active&Queue=Parse-RecDescent',
+            },
+        },
+    },
 );
 
 $builder->create_build_script();

@@ -851,3 +851,9 @@ Revision history for Parse-RecDescent
 
     - Update tests to handle '.' no longer being part of @INC in
       perl-5.26.0. (RT.cpan.org #120415, thanks Jim!)
+
+1.967015      Tue Apr  4 07:38:07 2017
+
+    - Fix misuse of require to include MYMETA.pl, data is just
+      included in both Makefile.PL and Build.PL nowB. (RT.cpan.org
+      #120922, thanks Kent!)
