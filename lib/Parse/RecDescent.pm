@@ -24,7 +24,7 @@ sub import  # IMPLEMENT PRECOMPILER BEHAVIOUR UNDER:
 
     if ($file eq '-' && $line == 0)
     {
-        _die("Usage: perl -MLocalTest - <grammarfile> <classname>")
+        _die("Usage: perl -MParse::RecDescent - <grammarfile> <classname> [runtimeclassname]")
             unless @ARGV >= 2 and $ARGV <= 3;
 
         my ($sourcefile, $class, $runtime_class) = @ARGV;
