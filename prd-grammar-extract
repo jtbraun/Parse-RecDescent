@@ -1,0 +1,146 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $file = shift || die "Usage: $0 <grammar-file>\n";
+
+open my $fh, $file or die "$file: $!";
+
+my $first = <$fh>;
+my ($package) = $first =~ /package (\S*?);/;
+eval $first . do { local $/; <$fh> };
+die $@ if $@;
+
+my $obj = $package->new;
+
+#print nice_dump($obj);
+
+my @LINES;
+my %rules = %{ $obj->{rules} };
+my %anon_rules = map { ($_ => delete $rules{$_}) } grep /^_/, %rules;
+#print "ANON: ", nice_dump(\%anon_rules);
+for my $name (sort keys %rules) {
+  my $rule = $obj->{rules}{$name};
+  add_line(\@LINES, $rule->{line}, 0, "$name:", 0); # only non-anons get this
+  handle_rule(\@LINES, $rule, 0, undef);
+}
+
+#print "LINES:\n", nice_dump(\@LINES);
+print(($_ || ''), "\n") for @LINES;
+
+sub handle_rule {
+  my ($lines, $rule, $depth, $line_override) = @_;
+#print "$rule->{name} (@{[$line_override//'undef']}): ", nice_dump($rule);
+  my $prod_number = 0;
+  for my $prod (@{ $rule->{prods} }) {
+    my $item_number = 0;
+    for my $item (@{ $prod->{items} }) {
+      handle_item(
+        $lines, $item, $prod_number, $item_number, $line_override, $depth,
+      );
+      $item_number++;
+    }
+    $prod_number++;
+  }
+}
+
+sub handle_item {
+  my ($lines, $item, $prod_number, $item_number, $line_override, $depth) = @_;
+  my $ref = ref $item;
+  $ref =~ s/^Parse::RecDescent::// or die "Unknown item type $ref";
+  my $or_prefix = (($prod_number > 0) && ($item_number == 0))
+    ? '| ' : '';
+  my $target_line = defined($line_override) ? $line_override : $item->{line};
+  if ($ref =~ /^(Token|Literal)/) {
+    add_line(
+      $lines, $target_line, $depth, $or_prefix . $item->{description}, 0,
+    );
+  } elsif ($ref =~ /^(Action)/) {
+    add_line(
+      $lines, $target_line, $depth, $or_prefix . $item->{code}, 0,
+    );
+  } elsif ($ref =~ /^(Operator)/) {
+    $target_line = $item->{leftarg}{line} if !defined $target_line;
+    add_line(
+      $lines, $target_line, $depth, $or_prefix . '<' . $item->{type}, 0,
+    );
+    handle_item(
+      $lines, $_, 0, 0, $line_override, $depth,
+    ) for @{$item}{qw(leftarg op rightarg)};
+    add_line(
+      $lines, $target_line, $depth, '>', 1,
+    );
+  } elsif ($ref =~ /^(Subrule)/) {
+    my $subrule = $item->{subrule};
+    if ($subrule =~ /^_/) {
+      # anon, recurse
+#print "SUB($subrule)\n";
+      handle_anon($lines, $item, $target_line, $depth, $or_prefix, $subrule);
+    } else {
+      add_line(
+        $lines, $target_line, $depth + 2,
+        $or_prefix . $subrule, 0,
+      );
+    }
+  } elsif ($ref =~ /^(Repetition)/) {
+    my $subrule = $item->{subrule};
+#print "REP($subrule)\n";
+    if ($subrule =~ /^_/) {
+      # anon, recurse
+      handle_anon($lines, $item, $target_line, $depth, $or_prefix, $subrule);
+    } else {
+      add_line(
+        $lines, $target_line, $depth + 2,
+        $or_prefix . $subrule, 0,
+      );
+    }
+    # again hoping on same line
+    add_line(
+      $lines, $target_line, $depth + 2,
+      "($item->{repspec})", 1,
+    );
+  } elsif ($ref =~ /^(Error)/) {
+    add_line(
+      $lines, $target_line, $depth + 2, $or_prefix . '<error>', 0,
+    );
+  } else {
+    die "Unknown object of type '$ref'";
+  }
+}
+
+# supply line as anon rules have line-number off end of file!
+sub handle_anon {
+  my ($lines, $item, $line, $depth, $or_prefix, $subrule) = @_;
+  add_line(
+    $lines, $line, $depth, $or_prefix . '(', 0,
+  );
+  handle_rule($lines, $anon_rules{$subrule}, $depth + 2, $line);
+  add_line(
+    $lines, $line, $depth, ')', 0,
+  );
+}
+
+sub add_line {
+  my ($lines, $no, $depth, $text, $force_close) = @_;
+#print "LINE($no)($force_close)($text)\n";
+  for my $text_line (split /\n/, $text) {
+    $text_line =~ s#\\\\#\\#g;
+    if (defined $lines->[$no]) {
+      # line already exists, just append
+      $lines->[$no] .= ($force_close ? '' : ' ') . $text_line;
+    } else {
+      $lines->[$no] = (' ' x $depth) . $text_line;
+    }
+    $no++;
+  }
+}
+
+sub nice_dump {
+  require Data::Dumper;
+  local ($Data::Dumper::Terse, $Data::Dumper::Sortkeys, $Data::Dumper::Indent);
+  $Data::Dumper::Terse = 1;
+  $Data::Dumper::Sortkeys = 1;
+  $Data::Dumper::Indent = 1;
+  Data::Dumper::Dumper($_[0]);
+}
