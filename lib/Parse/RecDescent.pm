@@ -4166,7 +4166,7 @@ For efficiency, C<$thisoffset> and C<$prevoffset> are
 actually tied hashes, and only recompute the required offset
 when the variable's value is used.
 
-Assignment to C<$thisoffset> or <$prevoffset> is a fatal error.
+Assignment to C<$thisoffset> or C<$prevoffset> is a fatal error.
 
 Modifying the value of the variable C<$text> will I<not> affect the
 offset counting mechanism.
@@ -6065,7 +6065,7 @@ which automatically prevents type names from being typedef'd, or:
 
 which allows the user to change the abort key binding, but not to unbind it.
 
-The careful use of such constructs makes it possible to reconfigure a
+The careful use of such constructs makes it possible to reconfigure
 a running parser, eliminating the need for semantic feedback by
 providing syntactic feedback instead. However, as currently implemented,
 C<Replace()> and C<Extend()> have to regenerate and re-C<eval> the
